@@ -1,5 +1,4 @@
 import {Routes, Route} from 'react-router-dom';
-import DesktopLayout from './layout/DesktopLayout'
 import Desktop from './Pages/Desktop'
 
 function App() {
@@ -16,9 +15,7 @@ function App() {
             <Route
                 path="/"
                 element = {
-                    <DesktopLayout>
-                        <Desktop/>
-                    </DesktopLayout>
+                      <Desktop/>
                 }
             />
         </Routes>
@@ -27,10 +24,3 @@ function App() {
 }
 
 export default App;
-
-
-{/* <div className="min-h-screen bg-gradient-to-br from-indigo-500 to-pink-400 flex items-center justify-center">
-                        <h1 className="text-white text-4xl font-bold">
-                            ✅ Tailwind is working!
-                        </h1>
-                    </div> */}
