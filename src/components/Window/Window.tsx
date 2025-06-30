@@ -9,9 +9,11 @@ interface Position {
 interface WindowProps {
     id: string;
     title: string;
-    content: JSX.Element;
     initialPosition: Position;
     zIndex: number;
+    width: number;
+    height: number;
+    children: React.ReactNode; // To render the specific app component
     onClose: (id: string) => void;
     onFocus: (id: string) => void;
     onDragStop: (id: string, pos: Position) => void;
@@ -76,7 +78,7 @@ const useDraggable = (id: string, initialPosition: Position, onDragStop: (id: st
 };
 
 // --- Window Component ---
-const Window: FC<WindowProps> = ({ id, title, content, initialPosition, zIndex, onClose, onFocus, onDragStop }) => {
+const Window: FC<WindowProps> = ({ id, title, children, initialPosition, zIndex, width, height, onClose, onFocus, onDragStop }) => {
     const { position, handleMouseDown } = useDraggable(id, initialPosition, onDragStop);
     
     return (
@@ -85,8 +87,8 @@ const Window: FC<WindowProps> = ({ id, title, content, initialPosition, zIndex, 
             style={{
                 top: `${position.y}px`,
                 left: `${position.x}px`,
-                width: '400px',
-                minHeight: '250px',
+                width: `${width}px`, 
+                height: `${height}px`,
                 zIndex: zIndex,
             }}
             onMouseDown={() => onFocus(id)} // Bring to front on any click within the window
@@ -106,7 +108,7 @@ const Window: FC<WindowProps> = ({ id, title, content, initialPosition, zIndex, 
 
             {/* Content Area */}
             <div className="flex-grow text-gray-800">
-                {content}
+                {children}
             </div>
         </div>
     );

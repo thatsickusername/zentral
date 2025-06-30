@@ -1,10 +1,16 @@
-import { FC, JSX } from "react";
+import { FC } from "react";
+import MusicPlayer from "../../applications/MusicPlayer/MusicPlayer";
+import Notes from "../../applications/Notes/Notes";
+import Timer from "../../applications/Timer/Timer";
 
+// AppDefinition now holds the component reference and its default size
 interface AppDefinition {
     id: string;
     title: string;
     icon: FC<React.SVGProps<SVGSVGElement>>;
-    content: JSX.Element;
+    component: FC; // Reference to the app's functional component
+    defaultWidth?: number;
+    defaultHeight?: number;
 }
 
 interface DockProps {
@@ -31,11 +37,11 @@ const Icons = {
 };
 
 
-// --- App Definitions ---
+// --- App Definitions with Component and Size ---
 const APPS: AppDefinition[] = [
-    { id: 'photos', title: 'Photos', icon: Icons.Photos, content: <div className="p-4"><h3 className="font-bold mb-2">My Photo Gallery</h3><p>This is where your photos would appear. It's a simple, static content area for this demo.</p></div> },
-    { id: 'music', title: 'Music Player', icon: Icons.Music, content: <div className="p-4"><h3 className="font-bold mb-2">Now Playing</h3><p>Your minimalist music player controls would go here. Imagine a playlist and play/pause buttons.</p></div> },
-    { id: 'settings', title: 'Settings', icon: Icons.Settings, content: <div className="p-4"><h3 className="font-bold mb-2">System Settings</h3><p>Adjust your preferences here. Toggles, sliders, and other controls would live in this window.</p></div> },
+    { id: 'musicPlayer', title: 'Music Player', icon: Icons.Photos, component: MusicPlayer, defaultWidth: 350, defaultHeight: 320 },
+    { id: 'notes', title: 'Notes', icon: Icons.Music, component: Notes, defaultWidth: 300, defaultHeight: 180 },
+    { id: 'timer', title: 'Timer', icon: Icons.Settings, component: Timer, defaultWidth: 400, defaultHeight: 280 },
 ];
 
 const Dock: FC<DockProps> = ({ onIconClick }) => {
@@ -46,9 +52,9 @@ const Dock: FC<DockProps> = ({ onIconClick }) => {
                     <button
                         key={app.id}
                         onClick={() => onIconClick(app)}
-                        className="w-14 h-14 bg-gray-200/50 rounded-lg flex items-center justify-center text-gray-700
+                        className="w-14 h-14 bg-gray-300/50 rounded-lg flex items-center justify-center text-gray-700
                                    transition-all duration-200 ease-in-out
-                                   hover:bg-gray-300/70 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                   hover:bg-gray-400/70 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400"
                         aria-label={`Open ${app.title}`}
                     >
                         <app.icon className="w-7 h-7" />
