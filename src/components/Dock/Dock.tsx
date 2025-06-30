@@ -40,7 +40,7 @@ const Icons = {
 // --- App Definitions with Component and Size ---
 const APPS: AppDefinition[] = [
     { id: 'musicPlayer', title: 'Music Player', icon: Icons.Photos, component: MusicPlayer, defaultWidth: 350, defaultHeight: 320 },
-    { id: 'notes', title: 'Notes', icon: Icons.Music, component: Notes, defaultWidth: 300, defaultHeight: 180 },
+    { id: 'notes', title: 'Notes', icon: Icons.Music, component: Notes, defaultWidth: 600, defaultHeight: 400 },
     { id: 'timer', title: 'Timer', icon: Icons.Settings, component: Timer, defaultWidth: 400, defaultHeight: 280 },
 ];
 

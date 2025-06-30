@@ -83,7 +83,7 @@ const Window: FC<WindowProps> = ({ id, title, children, initialPosition, zIndex,
     
     return (
         <div
-            className="absolute bg-white/80 backdrop-blur-md rounded-lg shadow-2xl flex flex-col overflow-hidden border border-gray-300/50"
+            className="absolute bg-white/60 backdrop-blur-md rounded-lg shadow-2xl flex flex-col overflow-hidden border border-gray-300/50"
             style={{
                 top: `${position.y}px`,
                 left: `${position.x}px`,
@@ -107,7 +107,7 @@ const Window: FC<WindowProps> = ({ id, title, children, initialPosition, zIndex,
             </div>
 
             {/* Content Area */}
-            <div className="flex-grow text-gray-800">
+            <div className="flex-grow text-gray-800 overflow-auto">
                 {children}
             </div>
         </div>
