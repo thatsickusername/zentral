@@ -18,7 +18,7 @@ const  TodoItem: FC<TodoItemProps> = ({id, text, completed, onToggleComplete, on
     }
 
     return (
-        <div className="flex items-start py-1.5 px-0.5 my-1 hover:bg-gray-100 rounded">
+        <div className="flex items-start py-1.5 px-0.5 my-1 hover:bg-gray-400/10 rounded">
             <div
                 className="custom-checkbox flex-shrink-0 w-5 h-5 border-2 border-gray-300 rounded flex items-center justify-center cursor-pointer transition-colors duration-100 mr-2.5"
                 onClick={(e: React.MouseEvent<HTMLDivElement>) => { e.stopPropagation(); onToggleComplete(id); }}

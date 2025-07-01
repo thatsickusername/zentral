@@ -1,6 +1,6 @@
 import { FC } from "react";
 import MusicPlayer from "../../applications/MusicPlayer/MusicPlayer";
-import Notes from "../../applications/Notes/Notes";
+import Tasks from "../../applications/Tasks/Tasks";
 import Timer from "../../applications/Timer/Timer";
 
 // AppDefinition now holds the component reference and its default size
@@ -40,7 +40,7 @@ const Icons = {
 // --- App Definitions with Component and Size ---
 const APPS: AppDefinition[] = [
     { id: 'musicPlayer', title: 'Music Player', icon: Icons.Photos, component: MusicPlayer, defaultWidth: 350, defaultHeight: 320 },
-    { id: 'notes', title: 'Notes', icon: Icons.Music, component: Notes, defaultWidth: 600, defaultHeight: 400 },
+    { id: 'tasks', title: 'Tasks', icon: Icons.Music, component: Tasks, defaultWidth: 500, defaultHeight: 400 },
     { id: 'timer', title: 'Timer', icon: Icons.Settings, component: Timer, defaultWidth: 400, defaultHeight: 280 },
 ];
 
