@@ -1,31 +1,73 @@
 import { useEffect, useRef, useState } from "react";
 import chime from "./Sounds/timerCompleted.mp3" 
 
+interface Mode{
+    key: string,
+    label: string
+    duration: number
+}
+
 function Timer() {
+    const [modes, setModes] = useState<Mode[]>([
+        { key: 'pomodoro', label: 'Pomodoro', duration: 5 },
+        { key: 'shortBreak', label: 'Short Break', duration: 6 },
+        { key: 'longBreak', label: 'Long Break', duration: 4 }
+      ]);
+    const [activeModeKey, setAciveModeKey] = useState('pomodoro')
+    const activeMode = modes.find(mode => mode.key === activeModeKey) || modes[0]
 
     const [isTimerActive, setIsTimerActive] =useState(false)
-    const [totalSeconds, setTotalSeconds] = useState(5)
+    const [totalSeconds, setTotalSeconds] = useState(activeMode.duration)
     const minutes = Math.floor(totalSeconds / 60)
     const seconds = Math.floor(totalSeconds % 60)
 
     const intervalRef = useRef<number | null> (null) // initializing a ref as null for our interval-ID so that we can stop it later
     const chimeRef = useRef<HTMLAudioElement>(null)
 
+    const [pomodoroCounter, setPomodoroCounter] = useState(0)
+
+    useEffect(()=>{
+        setTotalSeconds(activeMode.duration)
+    },[activeMode])
+    
+
     useEffect(()=>{
         if(isTimerActive){
 
             intervalRef.current = window.setInterval(()=>{
 
-                setTotalSeconds(prev=> {
-                    if(prev === 1) {
-                        chimeRef.current?.play();
-                        setIsTimerActive(false)
-                        if(intervalRef.current){
-                            clearInterval(intervalRef.current)
+                setTotalSeconds((prev) => {
+                    if (prev === 1) {
+                      chimeRef.current?.play();
+                      setIsTimerActive(false);
+                  
+                      setPomodoroCounter((count) => {
+                        const nextCount = count + 1;
+                  
+                        if (activeModeKey === 'pomodoro') {
+                          // Pomodoro just ended
+                          if (nextCount < 5) {
+                            setAciveModeKey('shortBreak');
+                          } else {
+                            setAciveModeKey('longBreak');
+                          }
+                          return nextCount;
+                        } else {
+                          // Any break just ended → back to Pomodoro
+                          setAciveModeKey('pomodoro');
+                  
+                          // Reset counter if long break just happened
+                          return activeModeKey === 'longBreak' ? 0 : count;
                         }
+                      });
+                  
+                      if (intervalRef.current) {
+                        clearInterval(intervalRef.current);
+                      }
                     }
-                    return prev - 1
-                })
+                  
+                    return prev - 1;
+                  });
             }, 1000)
         }
 
@@ -84,7 +126,7 @@ function Timer() {
 
             {/* Current mode display */}
             <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-            Pomodoro
+            {activeMode.label}
             </h2>
 
             <div className="text-8xl font-bold text-gray-800 mb-8 tracking-tight">
