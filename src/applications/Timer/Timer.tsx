@@ -174,14 +174,13 @@ function Timer() {
                         Reset
                     </button>
                 </div>
-
-                <audio ref={chimeRef} src={chime}/>
+                {/* Pomodoro count display */}
+                <p className="mt-6 text-gray-600 text-sm">
+                Pomodoros completed: <span className="font-semibold text-gray-800">{pomodoroCounter}</span>
+                </p>
             </div>
 
-            {/* Pomodoro count display */}
-            <p className="mt-6 text-gray-600 text-sm">
-            Pomodoros completed: <span className="font-semibold text-gray-800">{pomodoroCounter}</span>
-            </p>
+            
             
             <TimerSettingsMenu 
                 displaySettings={isSettingsOpen}   
@@ -191,6 +190,8 @@ function Timer() {
                 onSave={handleSettingsSave}
                 onCancel={() => setIsSettingsOpen(false)}
             />
+
+            <audio ref={chimeRef} src={chime}/>
         </div>
     );
 }
