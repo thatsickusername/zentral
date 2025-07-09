@@ -17,11 +17,16 @@ interface DockProps {
     onIconClick: (app: AppDefinition) => void;
 }
 
-// --- SVG Icons for our "Apps" ---
+// --- SVG Icons for "Apps" ---
 const Icons = {
-    Photos: (props: React.SVGProps<SVGSVGElement>) => (
+    Tasks: (props: React.SVGProps<SVGSVGElement>) => (
         <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline>
+            {/* Box with an open top-right corner */}
+            <path d="M4 4 L4 20 L20 20 L20 6" /> {/* Draws the left, bottom, and partial right side of the box */}
+            <path d="M4 4 L16 4" /> {/* Draws the partial top side of the box */}
+
+            {/* Checkmark that flows out of the open corner */}
+            <polyline points="7 12 12 17 19 5" /> 
         </svg>
     ),
     Music: (props: React.SVGProps<SVGSVGElement>) => (
@@ -29,9 +34,10 @@ const Icons = {
             <path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>
         </svg>
     ),
-    Settings: (props: React.SVGProps<SVGSVGElement>) => (
-         <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle>
+    Timer: (props: React.SVGProps<SVGSVGElement>) => (
+        <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
         </svg>
     ),
 };
@@ -39,9 +45,9 @@ const Icons = {
 
 // --- App Definitions with Component and Size ---
 const APPS: AppDefinition[] = [
-    { id: 'musicPlayer', title: 'Music Player', icon: Icons.Photos, component: MusicPlayer, defaultWidth: 350, defaultHeight: 320 },
-    { id: 'tasks', title: 'Tasks', icon: Icons.Music, component: Tasks, defaultWidth: 500, defaultHeight: 400 },
-    { id: 'timer', title: 'Timer', icon: Icons.Settings, component: Timer, defaultWidth: 450, defaultHeight: 350 },
+    { id: 'musicPlayer', title: 'Music Player', icon: Icons.Music, component: MusicPlayer, defaultWidth: 350, defaultHeight: 320 },
+    { id: 'tasks', title: 'Tasks', icon: Icons.Tasks, component: Tasks, defaultWidth: 500, defaultHeight: 400 },
+    { id: 'timer', title: 'Timer', icon: Icons.Timer, component: Timer, defaultWidth: 450, defaultHeight: 380 },
 ];
 
 const Dock: FC<DockProps> = ({ onIconClick }) => {

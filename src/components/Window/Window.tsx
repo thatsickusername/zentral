@@ -101,7 +101,7 @@ const Window: FC<WindowProps> = ({ id, title, children, initialPosition, zIndex,
                 <span className="text-sm font-medium text-gray-700 select-none">{title}</span>
                 <button
                     onClick={() => onClose(id)}
-                    className="w-5 h-5 bg-red-500 rounded-full hover:bg-red-600 focus:outline-none transition-colors"
+                    className="w-4 h-4 bg-red-500 rounded-full hover:bg-red-600 focus:outline-none transition-colors"
                     aria-label="Close window"
                 />
             </div>
