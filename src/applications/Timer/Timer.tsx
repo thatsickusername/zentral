@@ -32,7 +32,7 @@ function Timer() {
         setTotalSeconds(activeMode.duration)
     },[activeMode])
     
-    console.log(modes)
+    // console.log(modes)
 
     useEffect(()=>{
         if(isTimerActive){
@@ -177,6 +177,11 @@ function Timer() {
 
                 <audio ref={chimeRef} src={chime}/>
             </div>
+
+            {/* Pomodoro count display */}
+            <p className="mt-6 text-gray-600 text-sm">
+            Pomodoros completed: <span className="font-semibold text-gray-800">{pomodoroCounter}</span>
+            </p>
             
             <TimerSettingsMenu 
                 displaySettings={isSettingsOpen}   

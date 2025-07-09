@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, FC, JSX, MouseEvent as ReactMouseEvent} from "react";
+import { useEffect, useState, useRef, FC, MouseEvent as ReactMouseEvent} from "react";
 
 // --- Type Definitions ---
 interface Position {

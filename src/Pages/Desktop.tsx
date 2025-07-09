@@ -1,6 +1,6 @@
 import TopBar from "../components/TopBar/TopBar";
 import Dock from "../components/Dock/Dock";
-import React, { useState, FC, JSX } from 'react';
+import React, { useState, FC } from 'react';
 import Window from "../components/Window/Window";
 
 // --- Type Definitions ---

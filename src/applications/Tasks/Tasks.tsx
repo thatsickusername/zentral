@@ -31,7 +31,7 @@ function Tasks() {
         })
 
         setNewTodoText("")
-        console.log(todoList)
+        // console.log(todoList)
     }
 
     const toggleCompleteTodo = (id: string) =>{
