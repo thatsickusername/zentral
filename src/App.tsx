@@ -1,5 +1,7 @@
 import {Routes, Route} from 'react-router-dom';
 import Desktop from './Pages/Desktop'
+import ProtectedRoute from './components/routes/ProtectedRoute';
+import LoginPage from './Pages/LoginPage';
 
 function App() {
     return (
@@ -7,15 +9,15 @@ function App() {
             <Route
                 path="/login"
                 element={
-                    <div>
-                        Login Please
-                    </div>
+                    <LoginPage/>
                 }
             />
             <Route
                 path="/"
                 element = {
-                      <Desktop/>
+                    <ProtectedRoute>
+                        <Desktop/>
+                    </ProtectedRoute>
                 }
             />
         </Routes>

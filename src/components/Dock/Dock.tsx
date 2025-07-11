@@ -53,14 +53,14 @@ const APPS: AppDefinition[] = [
 const Dock: FC<DockProps> = ({ onIconClick }) => {
     return (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2">
-            <div className="flex items-center justify-center gap-3 bg-white/50 backdrop-blur-xl p-2 rounded-xl border border-gray-200/60 shadow-lg">
+            <div className="flex items-center justify-center gap-3 bg-white/40 backdrop-blur-xl p-2 rounded-xl border border-opacity-30 border-white shadow-lg">
                 {APPS.map(app => (
                     <button
                         key={app.id}
                         onClick={() => onIconClick(app)}
                         className="w-14 h-14 bg-gray-300/50 rounded-lg flex items-center justify-center text-gray-700
                                    transition-all duration-200 ease-in-out
-                                   hover:bg-gray-400/70 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                   hover:bg-white/60 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400"
                         aria-label={`Open ${app.title}`}
                     >
                         <app.icon className="w-7 h-7" />

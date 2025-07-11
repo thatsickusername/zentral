@@ -83,7 +83,7 @@ const Window: FC<WindowProps> = ({ id, title, children, initialPosition, zIndex,
     
     return (
         <div
-            className="absolute bg-white/60 backdrop-blur-md rounded-lg shadow-2xl flex flex-col overflow-hidden border border-gray-300/50"
+            className="absolute bg-white/60 backdrop-blur-md rounded-xl shadow-2xl flex flex-col overflow-hidden border border-opacity-30 border-white"
             style={{
                 top: `${position.y}px`,
                 left: `${position.x}px`,
@@ -98,7 +98,7 @@ const Window: FC<WindowProps> = ({ id, title, children, initialPosition, zIndex,
                 className="h-8 bg-gray-100/80 flex items-center justify-between px-2 cursor-move border-b border-gray-200/80"
                 onMouseDown={handleMouseDown}
             >
-                <span className="text-sm font-medium text-gray-700 select-none">{title}</span>
+                <span className="text-sm pl-2 font-medium text-gray-700 select-none">{title}</span>
                 <button
                     onClick={() => onClose(id)}
                     className="w-4 h-4 bg-red-500 rounded-full hover:bg-red-600 focus:outline-none transition-colors"
