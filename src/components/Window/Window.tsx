@@ -101,9 +101,20 @@ const Window: FC<WindowProps> = ({ id, title, children, initialPosition, zIndex,
                 <span className="text-sm pl-2 font-medium text-gray-700 select-none">{title}</span>
                 <button
                     onClick={() => onClose(id)}
-                    className="w-4 h-4 bg-red-500 rounded-full hover:bg-red-600 focus:outline-none transition-colors"
+                    className="w-4 h-4 text-red-500 hover:text-white font-semibold flex items-center justify-center bg-red-500 rounded-full hover:bg-red-600 focus:outline-none transition-all"
                     aria-label="Close window"
-                />
+                >
+                     <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        className="w-3 h-3"
+                    >
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
 
             {/* Content Area */}
