@@ -1,13 +1,6 @@
 import {db} from "./firebase"
 import { collection, setDoc, doc, getDoc, serverTimestamp, getDocs, writeBatch } from 'firebase/firestore'
-
-export interface Task {
-  id?: string; // only for existing tasks
-  content: string;
-  completed: boolean;
-  deleted?: boolean; // if marked for deletion
-  updatedLocally?: boolean; // if changed since last sync
-}
+import { Task } from "../types/Tasks";
 
 interface UserInfo {
   uid: string;
@@ -71,7 +64,7 @@ export const useFirestore = ()=>{
           }
     
           // 2. ADD
-          else if (!task.id) {
+          else if (task.isNew) {
             const newTaskRef = doc(tasksCollection); // Auto ID
             batch.set(newTaskRef, {
               content: task.content,
@@ -81,7 +74,7 @@ export const useFirestore = ()=>{
           }
     
           // 3. UPDATE
-          else if (task.updatedLocally) {
+          else if (task.updatedLocally && task.id) {
             const taskRef = doc(db, "users", uid, "tasks", task.id);
             batch.set(
               taskRef,
