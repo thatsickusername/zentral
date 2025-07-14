@@ -3,16 +3,9 @@ import TodoItem from "./TodoItem";
 import { useTasks } from "../../hooks/useTasks";
 import { Task } from "../../types/Tasks";
 
-interface Todo{
-    id: string,
-    text: string,
-    completed: boolean
-}
-
-
 function Tasks() {
 
-    const {tasks, setTasks, isLoading, setIsLoading, addTask, toggleTask, editTask, removeTask} = useTasks()
+    const {tasks, addTask, toggleTask, editTask, removeTask} = useTasks()
 
     const [filterStatus,setFilteredStatus] = useState<string>("All")
     const filteredList = tasks.filter(todo => {
