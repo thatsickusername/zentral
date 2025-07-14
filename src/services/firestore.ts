@@ -61,6 +61,7 @@ export const useFirestore = ()=>{
           if (task.deleted && task.id) {
             const taskRef = doc(db, "users", uid, "tasks", task.id);
             batch.delete(taskRef);
+            console.log(task.id, "deleted from firestore")
           }
     
           // 2. ADD

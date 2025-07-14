@@ -1,5 +1,5 @@
 export interface Task {
-    id?: string
+    id: string
     content: string
     completed: boolean
     createdAt: any

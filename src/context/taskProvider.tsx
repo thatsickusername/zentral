@@ -11,6 +11,7 @@ export interface TaskContextType {
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
     addTask: (content: string) => void;
     toggleTask: (id: string) => void;
+    editTask: (id: string, content: string) => void;
     removeTask: (id: string) => void;
 }
 
@@ -49,18 +50,18 @@ export const TaskProvider:FC<TaskProviderProps> = ({children}) =>{
         if(!user?.uid) return
 
         const interval = setInterval(()=>{
-            const hasUnSyncedChanges = tasks.some(task => task.updatedLocally || task.deleted)
+            const unSyncedTasks = tasks.filter(task => task.updatedLocally || task.deleted || task.isNew)
 
-            if(hasUnSyncedChanges) {
+            if(unSyncedTasks.length > 0) {
                 setIsSyncing(true)
-                syncTasks(user.uid, tasks)
+                syncTasks(user.uid, unSyncedTasks)
                     .then(()=> {
-                        const updated = tasks.map(task => ({
+                        const updatedTasks = tasks.map(task => ({
                             ...task,
                             updatedLocally: false,
-                            deleted: task.deleted ?? false
-                        }))
-                        setTasks(updated)
+                            isNew: false,
+                        })).filter(task => !task.deleted)
+                        setTasks(updatedTasks)
                     })
                     .catch(error => {
                         console.log(error)
@@ -69,7 +70,7 @@ export const TaskProvider:FC<TaskProviderProps> = ({children}) =>{
                         setIsSyncing(false)
                     })
             }
-        }, 3000)
+        }, 500)
 
         return ()=> clearInterval(interval)
     }, [tasks, user])
@@ -81,7 +82,7 @@ export const TaskProvider:FC<TaskProviderProps> = ({children}) =>{
             content,
             completed: false,
             createdAt: new Date(),
-            updatedLocally: false,
+            updatedLocally: true,
         }
         setTasks(prev => [...prev, newTask])
     }
@@ -100,11 +101,25 @@ export const TaskProvider:FC<TaskProviderProps> = ({children}) =>{
         }))
     }
 
+    //editTask 
+    const editTask = (taskId: string, newContent: string)=>{
+        setTasks(prev=> prev.map(task =>{
+            if(task.id === taskId){
+                return {
+                    ...task,
+                    content: newContent,
+                    updatedLocally: true,
+                }
+            }else return task
+        }))
+    }
+
     //removetask
 
     const removeTask= (taskId: string) =>{
         setTasks(prev=> prev.map((task)=>{
             if(task.id ===taskId){
+                console.log(task.id, "deleted from context")
                 return  {
                     ...task,
                     deleted: true,
@@ -115,7 +130,7 @@ export const TaskProvider:FC<TaskProviderProps> = ({children}) =>{
     }
 
     return (
-        <TaskContext.Provider value={{tasks, setTasks, isLoading, isSyncing, setIsLoading, addTask, toggleTask, removeTask}}>
+        <TaskContext.Provider value={{tasks, setTasks, isLoading, isSyncing, setIsLoading, addTask, toggleTask, editTask, removeTask}}>
             {!isLoading && children}
         </TaskContext.Provider>
     );

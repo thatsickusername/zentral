@@ -1,5 +1,7 @@
 import { useRef, useState } from "react";
 import TodoItem from "./TodoItem";
+import { useTasks } from "../../hooks/useTasks";
+import { Task } from "../../types/Tasks";
 
 interface Todo{
     id: string,
@@ -9,12 +11,14 @@ interface Todo{
 
 
 function Tasks() {
-    const [todoList, setTodoList] = useState<Todo[]>([])
+
+    const {tasks, setTasks, isLoading, setIsLoading, addTask, toggleTask, editTask, removeTask} = useTasks()
+
     const [filterStatus,setFilteredStatus] = useState<string>("All")
-    const filteredList = todoList.filter(todo => {
-        if(filterStatus === "All") return true
-        if(filterStatus === "Completed") return todo.completed
-        if(filterStatus === "Active") return !todo.completed
+    const filteredList = tasks.filter(todo => {
+        if(filterStatus === "All" && !todo.deleted) return true
+        if(filterStatus === "Completed" && !todo.deleted ) return todo.completed
+        if(filterStatus === "Active" && !todo.deleted) return !todo.completed
     })
     const [newTodoText, setNewTodoText] = useState<string>("")
     const newTodoInputRef = useRef<HTMLInputElement>(null)
@@ -26,39 +30,23 @@ function Tasks() {
     const addTodo = ()=>{
         if(newTodoText.trim() === '') return 
 
-        setTodoList((prevTodoList: Todo[]) => {
-            return([...prevTodoList, {id: Date.now().toString(), text: newTodoText, completed: false}])
-        })
-
+        addTask(newTodoText)
         setNewTodoText("")
-        // console.log(todoList)
     }
 
     const toggleCompleteTodo = (id: string) =>{
-        setTodoList(prevTodoList => 
-            prevTodoList.map(todo => 
-                todo.id === id 
-                    ? {...todo, completed: !todo.completed}
-                    : todo
-                
-            )
-        )   
+
+        toggleTask(id)  
     }
 
     const deleteTodo = (id: string) =>{
-        setTodoList(prevTodoList=>
-            prevTodoList.filter(todo => todo.id !== id)    
-        )
+        console.log(id, "sent for delete from context")
+        removeTask(id)
     }
 
     const editTodo = (id: string, newText: string) => {
-        setTodoList(prevTodoList=>
-            prevTodoList.map(todo =>
-                todo.id === id
-                    ? {...todo, text: newText}
-                    : todo
-            )
-        )
+
+        editTask(id, newText)
     }
 
     const focusNewTodoInput = ()=>{
@@ -80,11 +68,11 @@ function Tasks() {
                             onClick={()=> setFilteredStatus("Active")}>Active
                     </button>
                 </div>
-                {filteredList.map((todo: Todo)=>(
+                {filteredList.map((todo: Task)=>(
                 <TodoItem 
                         key={todo.id} 
                         id={todo.id}
-                        text={todo.text} 
+                        text={todo.content} 
                         completed={todo.completed}
                         onToggleComplete={toggleCompleteTodo}
                         onDelete={deleteTodo}
@@ -119,7 +107,7 @@ function Tasks() {
                         onKeyDown={(e)=> e.key === "Enter" && addTodo() }
                     />
                 </div>
-                {todoList.length===0 && (
+                {tasks.length===0 && (
                     <p className="text-center text-gray-500 text-lg mt-10">
                         No tasks yet! Add one above.
                     </p>
