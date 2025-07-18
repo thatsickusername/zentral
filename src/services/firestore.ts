@@ -1,6 +1,7 @@
 import {db} from "./firebase"
 import { collection, setDoc, doc, getDoc, serverTimestamp, getDocs, writeBatch } from 'firebase/firestore'
 import { Task } from "../types/Tasks";
+import { Session } from "../types/Session";
 
 interface UserInfo {
   uid: string;
@@ -89,8 +90,34 @@ export const useFirestore = ()=>{
         }
     
         await batch.commit();
-      };
+    };
+
+    const fetchAllSessions = async(uid: string): Promise<Session[]> =>{
+        const sessionsRef = collection(db, "users", uid, "sessions")
+        const sessionsSnap = await getDocs(sessionsRef)
+        return sessionsSnap.docs.map((doc)=>({
+            id: doc.id,
+            ...doc.data(),
+        })) as Session[]
+    }
+
+    const syncSesions = async (uid: string, sessions: Session[]): Promise<void> => {
+        const batch = writeBatch(db);
+        const sessionsCollection = collection(db, "users", uid, "sessions");
+
+        for(const session of sessions){
+          if(!session.id){
+            const newSessionRef = doc(sessionsCollection)
+            batch.set(newSessionRef, {
+              ...session,
+              completedAt: serverTimestamp()
+            })
+          }
+        }
+
+        await batch.commit()
+    }
 
 
-    return { checkIfInUser, fetchAllTasks, syncTasks}
+    return { checkIfInUser, fetchAllTasks, syncTasks, fetchAllSessions, syncSesions}
 }

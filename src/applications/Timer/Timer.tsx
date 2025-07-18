@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import chime from "./Sounds/timerCompleted.mp3" 
 import TimerSettingsMenu from "./TimerSettingsMenu";
+import { useTasks } from "../../hooks/useTasks";
 
 interface Mode{
     key: string,
@@ -27,6 +28,10 @@ function Timer() {
 
     const [pomodoroCounter, setPomodoroCounter] = useState(0)
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+    const [sessionTask, setSessionTask] = useState<string>()
+
+    const {tasks} = useTasks()
 
     useEffect(()=>{
         setTotalSeconds(activeMode.duration)
@@ -101,6 +106,10 @@ function Timer() {
         setIsSettingsOpen(!isSettingsOpen)
     }
 
+    const toggleDropdownMenu = ()=>{
+        setIsDropdownOpen(!isDropdownOpen)
+    }
+
 
     const handleSettingsSave = (pomodoro: number, shortBreak: number, longBreak: number) =>{
         setModes([
@@ -114,6 +123,11 @@ function Timer() {
         if (!isTimerActive) {
             setTotalSeconds(pomodoro)
         }
+    }
+
+    const handleSessionTaskInput = (taskId: string)=>{
+        setSessionTask(taskId)
+        setIsDropdownOpen(false)
     }
 
     return (
@@ -151,10 +165,43 @@ function Timer() {
                 {activeMode.label}
                 </h2>
 
-                <div className="text-8xl font-bold text-gray-800 mb-8 tracking-tight">
+                <div className="relative w-full max-w-xs">
+                    <div
+                        onClick={toggleDropdownMenu}
+                        className="flex items-center justify-between px-4 py-2 rounded-xl border border-gray-300 bg-white shadow-sm cursor-pointer hover:shadow-md transition-all"
+                    >
+                        <h2 className="text-sm font-medium text-gray-800">
+                            {sessionTask? sessionTask : "Choose a task"}
+                        </h2>
+                        <svg
+                        className={`w-4 h-4 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                        >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                    {isDropdownOpen && (
+                        <div className="absolute z-50 mt-1 w-full rounded-xl bg-white shadow-2xl border border-gray-200 overflow-hidden">
+                        {tasks.map((task) => (
+                            <div
+                            key={task.id}
+                            className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black transition-colors cursor-pointer"
+                            onClick={()=> handleSessionTaskInput(task.id)}
+                            >
+                            {task.content}
+                            </div>
+                        ))}
+                        </div>
+                    )}
+                </div>
+
+                <div className="text-8xl font-bold text-gray-800 my-4 tracking-tight">
                     {formatTime()}
                 </div>
-                <div className="flex space-x-4 mb-6">
+                <div className="flex space-x-4 my-6">
                     <button
                         onClick={toggleTimer}
                         className={`px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 ease-in-out
@@ -175,9 +222,10 @@ function Timer() {
                     </button>
                 </div>
                 {/* Pomodoro count display */}
-                <p className="mt-6 text-gray-600 text-sm">
+                {/* <p className="mt-6 text-gray-600 text-sm">
                 Pomodoros completed: <span className="font-semibold text-gray-800">{pomodoroCounter}</span>
-                </p>
+                </p> */}
+                
             </div>
 
             
