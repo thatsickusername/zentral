@@ -92,6 +92,13 @@ function Timer() {
         };
       }, [isTimerActive]);
       
+    
+    useEffect(()=>{
+        if(!isTimerActive && !activeTasks.find((todo)=> todo.id === sessionTaskID)){
+            setSessionTaskID("")
+            setSessionTaskContent("")
+        }
+    },[activeTasks,isTimerActive])
 
     const formatTime = () =>{
         const formatttedMinutes = String(minutes).padStart(2, '0')
@@ -175,55 +182,57 @@ function Timer() {
                 {activeMode.label}
                 </h2>
 
-                <div className="relative w-full max-w-xs">
-                    <div
-                        onClick={toggleDropdownMenu}
-                        className={`flex items-center justify-between px-4 py-2 rounded-xl border border-gray-300 transition-all
-                                    ${isTimerActive || activeModeKey !== 'pomodoro' ? "cursor-not-allowed": "bg-white shadow-sm cursor-pointer hover:shadow-md"}
-                            `}
-                    >
-                        <h2 className="text-sm font-medium text-gray-800">
-                            {sessionTaskContent? sessionTaskContent : "Choose a task"}
-                        </h2>
-                        <svg
-                        className={`w-4 h-4 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
+                {activeModeKey === 'pomodoro' &&
+                    (<div className="relative w-full max-w-xs">
+                        <div
+                            onClick={toggleDropdownMenu}
+                            className={`flex items-center justify-between px-4 py-2 rounded-xl border border-gray-300 transition-all
+                                        ${isTimerActive || activeModeKey !== 'pomodoro' ? "cursor-not-allowed": "bg-white shadow-sm cursor-pointer hover:shadow-md"}
+                                `}
                         >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </div>
-                    {isDropdownOpen && (
-                        <div className="absolute z-50 mt-1 w-full rounded-xl bg-white shadow-2xl border border-gray-200 overflow-hidden">
-                            {activeTasks.length === 0 && (
-                                <div className="px-4 py-2 text-sm text-gray-700">
-                                    Your task list is empty. Please create a task first
-                                </div>
-                            )}
-                            {activeTasks.map((task) => (
-                                <div
-                                key={task.id}
-                                className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black transition-colors cursor-pointer"
-                                onClick={()=> handleSessionTaskInput(task.id, task.content)}
-                                >
-                                {task.content}
-                                </div>
-                            ))}
+                            <h2 className="text-sm font-medium text-gray-800">
+                                {sessionTaskContent? sessionTaskContent : "Choose a task"}
+                            </h2>
+                            <svg
+                            className={`w-4 h-4 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                            >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
                         </div>
-                    )}
-                </div>
+                        {isDropdownOpen && (
+                            <div className="absolute z-50 mt-1 w-full rounded-xl bg-white shadow-2xl border border-gray-200 overflow-hidden">
+                                {activeTasks.length === 0 && (
+                                    <div className="px-4 py-2 text-sm text-gray-700">
+                                        Your task list is empty. Please create a task first
+                                    </div>
+                                )}
+                                {activeTasks.map((task) => (
+                                    <div
+                                    key={task.id}
+                                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black transition-colors cursor-pointer"
+                                    onClick={()=> handleSessionTaskInput(task.id, task.content)}
+                                    >
+                                    {task.content}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>)
+                }
 
                 <div className="text-8xl font-bold text-gray-800 my-4 tracking-tight">
                     {formatTime()}
                 </div>
                 <div className="flex space-x-4 my-6 justify-center">
                     <button
-                        disabled={sessionTaskID? false: true}
+                        disabled={!sessionTaskID && activeModeKey === 'pomodoro' ? true : false}
                         onClick={toggleTimer}
                         className={`px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 ease-in-out text-white shadow-lg
-                        ${!sessionTaskID
+                        ${!sessionTaskID && activeModeKey === 'pomodoro'
                             ?'bg-gray-500 shadow-lg cursor-not-allowed'
                             : isTimerActive
                             ? 'bg-red-500 shadow-lg hover:bg-red-600 active:bg-red-700'
@@ -231,7 +240,7 @@ function Timer() {
                         }
                         
                         transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-300`}>
-                        {isTimerActive ? 'Pause' : 'Start'}
+                        {isTimerActive && activeModeKey === 'pomodoro'? 'Pause' : 'Start'}
                     </button>
                     <button
                         onClick={resetTimer}
