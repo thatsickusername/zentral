@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import chime from "./Sounds/timerCompleted.mp3" 
 import TimerSettingsMenu from "./TimerSettingsMenu";
 import { useTasks } from "../../hooks/useTasks";
+import { useSessions } from "../../hooks/useSessions";
 
 interface Mode{
     key: string,
@@ -10,6 +11,9 @@ interface Mode{
 }
 
 function Timer() {
+
+    const {addSession} = useSessions()
+
     const [modes, setModes] = useState<Mode[]>([
         { key: 'pomodoro', label: 'Pomodoro', duration: 5 * 60 },
         { key: 'shortBreak', label: 'Short Break', duration: 6 * 60 },
@@ -29,7 +33,9 @@ function Timer() {
     const [pomodoroCounter, setPomodoroCounter] = useState(0)
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-    const [sessionTask, setSessionTask] = useState<string>()
+    const [sessionTaskID, setSessionTaskID] = useState<string>("")
+    const [sessionTaskContent, setSessionTaskContent] = useState<string>("")
+
 
     const {tasks} = useTasks()
 
@@ -39,52 +45,51 @@ function Timer() {
     
     // console.log(modes)
 
-    useEffect(()=>{
-        if(isTimerActive){
-
-            intervalRef.current = window.setInterval(()=>{
-
-                setTotalSeconds((prev) => {
-                    if (prev === 1) {
-                      chimeRef.current?.play();
-                      setIsTimerActive(false);
-                  
-                      setPomodoroCounter((count) => {
-                        const nextCount = count + 1;
-                  
-                        if (activeModeKey === 'pomodoro') {
-                          // Pomodoro just ended
-                          if (nextCount < 5) {
-                            setAciveModeKey('shortBreak');
-                          } else {
-                            setAciveModeKey('longBreak');
-                          }
-                          return nextCount;
-                        } else {
-                          // Any break just ended → back to Pomodoro
-                          setAciveModeKey('pomodoro');
-                  
-                          // Reset counter if long break just happened
-                          return activeModeKey === 'longBreak' ? 0 : count;
-                        }
-                      });
-                  
-                      if (intervalRef.current) {
-                        clearInterval(intervalRef.current);
-                      }
-                    }
-                  
-                    return prev - 1;
-                  });
-            }, 1000)
-        }
-
-        return ()=>{
-            if(intervalRef.current){
-                clearInterval(intervalRef.current)
+    useEffect(() => {
+        if (totalSeconds === 0 && isTimerActive) {
+          chimeRef.current?.play();
+          setIsTimerActive(false);
+      
+          // Side effect logic goes here
+          const type = activeModeKey === "pomodoro" ? "pomodoro" : "break";
+          const duration = activeModeKey === "longBreak"
+            ? modes[2].duration
+            : activeModeKey === "shortBreak"
+            ? modes[1].duration
+            : modes[0].duration;
+      
+          addSession(type, duration, sessionTaskID);
+      
+          setPomodoroCounter((count) => {
+            const nextCount = count + 1;
+      
+            if (activeModeKey === "pomodoro") {
+              if (nextCount < 5) {
+                setAciveModeKey("shortBreak");
+              } else {
+                setAciveModeKey("longBreak");
+              }
+              return nextCount;
+            } else {
+              setAciveModeKey("pomodoro");
+              return activeModeKey === "longBreak" ? 0 : count;
             }
+          });
         }
-    },[isTimerActive])
+      }, [totalSeconds, isTimerActive]); // dependency array
+      
+      useEffect(() => {
+        if (isTimerActive) {
+          intervalRef.current = window.setInterval(() => {
+            setTotalSeconds((prev) => Math.max(prev - 1, 0));
+          }, 1000);
+        }
+      
+        return () => {
+          if (intervalRef.current) clearInterval(intervalRef.current);
+        };
+      }, [isTimerActive]);
+      
 
     const formatTime = () =>{
         const formatttedMinutes = String(minutes).padStart(2, '0')
@@ -125,8 +130,9 @@ function Timer() {
         }
     }
 
-    const handleSessionTaskInput = (taskId: string)=>{
-        setSessionTask(taskId)
+    const handleSessionTaskInput = (taskId: string, taskContent: string)=>{
+        setSessionTaskID(taskId)
+        setSessionTaskContent(taskContent)
         setIsDropdownOpen(false)
     }
 
@@ -171,7 +177,7 @@ function Timer() {
                         className="flex items-center justify-between px-4 py-2 rounded-xl border border-gray-300 bg-white shadow-sm cursor-pointer hover:shadow-md transition-all"
                     >
                         <h2 className="text-sm font-medium text-gray-800">
-                            {sessionTask? sessionTask : "Choose a task"}
+                            {sessionTaskContent? sessionTaskContent : "Choose a task"}
                         </h2>
                         <svg
                         className={`w-4 h-4 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
@@ -189,7 +195,7 @@ function Timer() {
                             <div
                             key={task.id}
                             className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black transition-colors cursor-pointer"
-                            onClick={()=> handleSessionTaskInput(task.id)}
+                            onClick={()=> handleSessionTaskInput(task.id, task.content)}
                             >
                             {task.content}
                             </div>
@@ -201,7 +207,7 @@ function Timer() {
                 <div className="text-8xl font-bold text-gray-800 my-4 tracking-tight">
                     {formatTime()}
                 </div>
-                <div className="flex space-x-4 my-6">
+                <div className="flex space-x-4 my-6 justify-center">
                     <button
                         onClick={toggleTimer}
                         className={`px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 ease-in-out
@@ -222,9 +228,9 @@ function Timer() {
                     </button>
                 </div>
                 {/* Pomodoro count display */}
-                {/* <p className="mt-6 text-gray-600 text-sm">
+                <p className="mt-6 text-gray-600 text-sm">
                 Pomodoros completed: <span className="font-semibold text-gray-800">{pomodoroCounter}</span>
-                </p> */}
+                </p>
                 
             </div>
 

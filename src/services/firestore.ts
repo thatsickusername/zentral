@@ -41,18 +41,6 @@ export const useFirestore = ()=>{
         })) as Task[]
     }
 
-    /**
-   * Sync local tasks with Firestore
-   * uid - User ID
-   * tasks - Array of local tasks
-   * Each task can have:
-   * - id: string (if existing)
-   * - content: string
-   * - completed: boolean
-   * - deleted: boolean (optional)
-   * - updatedLocally: boolean (optional)
-   */
-
     const syncTasks = async (uid: string, tasks: Task[]): Promise<void> => {
         const batch = writeBatch(db);
         const tasksCollection = collection(db, "users", uid, "tasks");
@@ -108,8 +96,9 @@ export const useFirestore = ()=>{
         for(const session of sessions){
           if(!session.id){
             const newSessionRef = doc(sessionsCollection)
+            const { id, ...dataWithoutId } = session;
             batch.set(newSessionRef, {
-              ...session,
+              ...dataWithoutId,
               completedAt: serverTimestamp()
             })
           }

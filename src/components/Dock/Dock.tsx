@@ -47,7 +47,7 @@ const Icons = {
 const APPS: AppDefinition[] = [
     { id: 'musicPlayer', title: 'Music Player', icon: Icons.Music, component: MusicPlayer, defaultWidth: 350, defaultHeight: 320 },
     { id: 'tasks', title: 'Tasks', icon: Icons.Tasks, component: Tasks, defaultWidth: 500, defaultHeight: 400 },
-    { id: 'timer', title: 'Timer', icon: Icons.Timer, component: Timer, defaultWidth: 450, defaultHeight: 380 },
+    { id: 'timer', title: 'Timer', icon: Icons.Timer, component: Timer, defaultWidth: 450, defaultHeight: 400 },
 ];
 
 const Dock: FC<DockProps> = ({ onIconClick }) => {

@@ -3,6 +3,7 @@ import Desktop from './Pages/Desktop'
 import ProtectedRoute from './components/routes/ProtectedRoute';
 import LoginPage from './Pages/LoginPage';
 import { TaskProvider } from './context/taskProvider';
+import { SessionProvider } from './context/sessionProvider';
 
 function App() {
     return (
@@ -17,9 +18,11 @@ function App() {
                 path="/"
                 element = {
                     <ProtectedRoute>
-                        <TaskProvider>
-                            <Desktop/>
-                        </TaskProvider>
+                        <SessionProvider>
+                            <TaskProvider>
+                                <Desktop/>
+                            </TaskProvider>
+                        </SessionProvider>  
                     </ProtectedRoute>
                 }
             />

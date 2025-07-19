@@ -7,7 +7,7 @@ export interface SessionContextType {
     sessions: Session[]
     isLoading: boolean
     isSyncing: boolean
-    addSession: (session: Omit<Session, 'id' | 'completedAt'>) => void
+    addSession: (type: "pomodoro" | "break", duration: number, linkedTaskId: string) => void
     setSessions: React.Dispatch<React.SetStateAction<Session[]>>
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 }
@@ -38,8 +38,9 @@ export const SessionProvider:FC<SessionProviderProps> = ({children}) => {
                 setIsLoading(false)
             }
         }
+        console.log("sessions currently", sessions)
         loadSessions()
-    },[user])
+    },[user?.uid])
 
     useEffect(()=>{
         if(!user?.uid) return 
@@ -65,13 +66,19 @@ export const SessionProvider:FC<SessionProviderProps> = ({children}) => {
         return ()=> clearInterval(interval)
     }, [sessions, user])
 
-    const addSession = (session: Omit<Session, "id" | "completedAt">) => {
+    const addSession = (type: "pomodoro" | "break", duration: number, linkedTaskId: string) => {
         const newSession: Session = {
-            ...session, 
             id: undefined,
             completedAt: new Date(),
+            type: type,
+            duration: duration,
+            linkedTaskId: linkedTaskId,
         }
-        setSessions((prev) => [...prev, newSession])
+        setSessions((prev) => {
+            console.log("updated Sessions", [...prev, newSession])
+            return [...prev, newSession]
+        })
+        
     }
 
     return (

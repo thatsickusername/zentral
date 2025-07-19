@@ -70,7 +70,7 @@ export const TaskProvider:FC<TaskProviderProps> = ({children}) =>{
                         setIsSyncing(false)
                     })
             }
-        }, 500)
+        }, 5000)
 
         return ()=> clearInterval(interval)
     }, [tasks, user])
