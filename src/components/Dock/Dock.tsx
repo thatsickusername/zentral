@@ -52,7 +52,7 @@ const APPS: AppDefinition[] = [
 
 const Dock: FC<DockProps> = ({ onIconClick }) => {
     return (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2">
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[1000]">
             <div className="flex items-center justify-center gap-3 bg-white/40 backdrop-blur-xl p-2 rounded-xl border border-opacity-30 border-white shadow-lg">
                 {APPS.map(app => (
                     <button

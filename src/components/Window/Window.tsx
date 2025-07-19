@@ -95,7 +95,7 @@ const Window: FC<WindowProps> = ({ id, title, children, initialPosition, zIndex,
         >
             {/* Title Bar - Draggable Handle */}
             <div
-                className="h-8 bg-gray-100/80 flex items-center justify-between px-2 cursor-move border-b border-gray-200/80"
+                className="min-h-8 bg-gray-100/80 flex items-center justify-between px-2 cursor-move border-b border-gray-200/80"
                 onMouseDown={handleMouseDown}
             >
                 <span className="text-sm pl-2 font-medium text-gray-700 select-none">{title}</span>

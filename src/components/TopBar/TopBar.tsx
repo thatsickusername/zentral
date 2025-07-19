@@ -45,7 +45,7 @@ function TopBar() {
     }, [])
 
     return (
-      <div className="fixed top-0 left-0 right-0 z-50 h-8 px-3 flex items-center justify-between bg-white bg-opacity-40 text-gray-700 text-sm font-medium backdrop-blur-md border border-opacity-30 border-white">
+      <div className="fixed top-0 left-0 right-0 z-[1000] h-8 px-3 flex items-center justify-between bg-white bg-opacity-40 text-gray-700 text-sm font-medium backdrop-blur-md border border-opacity-30 border-white">
         <div className="flex items-center gap-2 h-full">
           <TopBarDropdown
               align="left"

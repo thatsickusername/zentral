@@ -39,6 +39,8 @@ function Timer() {
 
     const {tasks} = useTasks()
 
+    const activeTasks = tasks.filter(todo => !todo.completed)
+
     useEffect(()=>{
         setTotalSeconds(activeMode.duration)
     },[activeMode])
@@ -64,7 +66,7 @@ function Timer() {
             const nextCount = count + 1;
       
             if (activeModeKey === "pomodoro") {
-              if (nextCount < 5) {
+              if (nextCount < 3) {
                 setAciveModeKey("shortBreak");
               } else {
                 setAciveModeKey("longBreak");
@@ -112,7 +114,9 @@ function Timer() {
     }
 
     const toggleDropdownMenu = ()=>{
-        setIsDropdownOpen(!isDropdownOpen)
+        if (!isTimerActive && activeModeKey === 'pomodoro'){
+            setIsDropdownOpen(!isDropdownOpen)
+        }
     }
 
 
@@ -174,7 +178,9 @@ function Timer() {
                 <div className="relative w-full max-w-xs">
                     <div
                         onClick={toggleDropdownMenu}
-                        className="flex items-center justify-between px-4 py-2 rounded-xl border border-gray-300 bg-white shadow-sm cursor-pointer hover:shadow-md transition-all"
+                        className={`flex items-center justify-between px-4 py-2 rounded-xl border border-gray-300 transition-all
+                                    ${isTimerActive || activeModeKey !== 'pomodoro' ? "cursor-not-allowed": "bg-white shadow-sm cursor-pointer hover:shadow-md"}
+                            `}
                     >
                         <h2 className="text-sm font-medium text-gray-800">
                             {sessionTaskContent? sessionTaskContent : "Choose a task"}
@@ -191,15 +197,20 @@ function Timer() {
                     </div>
                     {isDropdownOpen && (
                         <div className="absolute z-50 mt-1 w-full rounded-xl bg-white shadow-2xl border border-gray-200 overflow-hidden">
-                        {tasks.map((task) => (
-                            <div
-                            key={task.id}
-                            className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black transition-colors cursor-pointer"
-                            onClick={()=> handleSessionTaskInput(task.id, task.content)}
-                            >
-                            {task.content}
-                            </div>
-                        ))}
+                            {activeTasks.length === 0 && (
+                                <div className="px-4 py-2 text-sm text-gray-700">
+                                    Your task list is empty. Please create a task first
+                                </div>
+                            )}
+                            {activeTasks.map((task) => (
+                                <div
+                                key={task.id}
+                                className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black transition-colors cursor-pointer"
+                                onClick={()=> handleSessionTaskInput(task.id, task.content)}
+                                >
+                                {task.content}
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>
@@ -209,12 +220,16 @@ function Timer() {
                 </div>
                 <div className="flex space-x-4 my-6 justify-center">
                     <button
+                        disabled={sessionTaskID? false: true}
                         onClick={toggleTimer}
-                        className={`px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 ease-in-out
-                        ${isTimerActive
-                            ? 'bg-red-500 text-white shadow-lg hover:bg-red-600 active:bg-red-700'
-                            : 'bg-blue-500 text-white shadow-lg hover:bg-blue-600 active:bg-blue-700'
+                        className={`px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 ease-in-out text-white shadow-lg
+                        ${!sessionTaskID
+                            ?'bg-gray-500 shadow-lg cursor-not-allowed'
+                            : isTimerActive
+                            ? 'bg-red-500 shadow-lg hover:bg-red-600 active:bg-red-700'
+                            : 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700'
                         }
+                        
                         transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-300`}>
                         {isTimerActive ? 'Pause' : 'Start'}
                     </button>
