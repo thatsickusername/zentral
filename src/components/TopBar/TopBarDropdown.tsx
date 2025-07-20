@@ -31,7 +31,7 @@ const TopBarDropdown: React.FC<DropdownProps> = ({trigger, children, align}) => 
 
             {open && (
                 <div
-                    className={`absolute z-50 mt-1 min-w-[10rem] rounded-xl shadow-2xl bg-white bg-opacity-40 text-gray-700 text-sm font-medium backdrop-blur-md border border-opacity-30 border-white transition-all ${
+                    className={`absolute z-50 mt-1 min-w-[10rem] rounded-xl shadow-2xl bg-white bg-opacity-40 backdrop-blur-md text-gray-700 text-sm font-medium border border-opacity-30 border-white transition-all ${
                     align === 'right' ? 'right-0' : 'left-0'
                     }`}
                 >
