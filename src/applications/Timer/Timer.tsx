@@ -52,13 +52,8 @@ function Timer() {
           chimeRef.current?.play();
           setIsTimerActive(false);
       
-          // Side effect logic goes here
           const type = activeModeKey === "pomodoro" ? "pomodoro" : "break";
-          const duration = activeModeKey === "longBreak"
-            ? modes[2].duration
-            : activeModeKey === "shortBreak"
-            ? modes[1].duration
-            : modes[0].duration;
+          const duration = activeMode.duration
       
           addSession(type, duration, sessionTaskID);
       
@@ -108,7 +103,34 @@ function Timer() {
     }
 
     const toggleTimer = () =>{
+        if(isTimerActive){
+            //calculate the duration: activeModeKey.duration - current timer
+            const currentDuration = activeMode.duration - totalSeconds
+
+            //add session with the current duration 
+            const type = activeModeKey === "pomodoro" ? "pomodoro" : "break";
+        
+            addSession(type, currentDuration, sessionTaskID);
+
+            //increase pomodoro counter
+            setPomodoroCounter((count) => {
+                const nextCount = count + 1;
+          
+                if (activeModeKey === "pomodoro") {
+                  if (nextCount < 3) {
+                    setAciveModeKey("shortBreak");
+                  } else {
+                    setAciveModeKey("longBreak");
+                  }
+                  return nextCount;
+                } else {
+                  setAciveModeKey("pomodoro");
+                  return activeModeKey === "longBreak" ? 0 : count;
+                }
+              });
+        }
         setIsTimerActive(!isTimerActive) 
+        
     }
 
     const resetTimer = () =>{
@@ -235,12 +257,12 @@ function Timer() {
                         ${!sessionTaskID && activeModeKey === 'pomodoro'
                             ?'bg-gray-500 shadow-lg cursor-not-allowed'
                             : isTimerActive
-                            ? 'bg-red-500 shadow-lg hover:bg-red-600 active:bg-red-700'
+                            ? 'bg-green-500 shadow-lg hover:bg-green-600 active:bg-green-700'
                             : 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700'
                         }
                         
                         transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-300`}>
-                        {isTimerActive && activeModeKey === 'pomodoro'? 'Pause' : 'Start'}
+                        {isTimerActive ? 'Finish' : 'Start'}
                     </button>
                     <button
                         onClick={resetTimer}
