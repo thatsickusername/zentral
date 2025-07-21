@@ -1,7 +1,8 @@
-import { FC } from "react";
+import React, { FC } from "react";
 import MusicPlayer from "../../applications/MusicPlayer/MusicPlayer";
 import Tasks from "../../applications/Tasks/Tasks";
 import Timer from "../../applications/Timer/Timer";
+import Analytics from "../../applications/Analytics/Analytics";
 
 // AppDefinition now holds the component reference and its default size
 interface AppDefinition {
@@ -40,6 +41,14 @@ const Icons = {
             <polyline points="12 6 12 12 16 14"></polyline>
         </svg>
     ),
+    Analytics: (props: React.SVGProps<SVGSVGElement>) => (
+        <svg {...props} xmlns="http://www.w3.org/2000/svg"  width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="12" width="6" height="8" rx="1" stroke="currentColor" stroke-width="2" fill="none"/>
+            <rect x="8" y="7" width="6" height="13" rx="1" stroke="currentColor" stroke-width="2" fill="none"/>
+            <rect x="14" y="2" width="6" height="18" rx="1" stroke="currentColor" stroke-width="2" fill="none"/>
+        </svg>
+
+    )
 };
 
 
@@ -48,6 +57,7 @@ const APPS: AppDefinition[] = [
     { id: 'musicPlayer', title: 'Music Player', icon: Icons.Music, component: MusicPlayer, defaultWidth: 350, defaultHeight: 320 },
     { id: 'tasks', title: 'Tasks', icon: Icons.Tasks, component: Tasks, defaultWidth: 500, defaultHeight: 400 },
     { id: 'timer', title: 'Timer', icon: Icons.Timer, component: Timer, defaultWidth: 450, defaultHeight: 400 },
+    { id: 'analytics', title: 'Analytics', icon: Icons.Analytics, component: Analytics, defaultWidth: 450, defaultHeight: 400 },
 ];
 
 const Dock: FC<DockProps> = ({ onIconClick }) => {
