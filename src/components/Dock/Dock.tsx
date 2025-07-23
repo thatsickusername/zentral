@@ -57,7 +57,7 @@ const APPS: AppDefinition[] = [
     { id: 'musicPlayer', title: 'Music Player', icon: Icons.Music, component: MusicPlayer, defaultWidth: 350, defaultHeight: 320 },
     { id: 'tasks', title: 'Tasks', icon: Icons.Tasks, component: Tasks, defaultWidth: 500, defaultHeight: 400 },
     { id: 'timer', title: 'Timer', icon: Icons.Timer, component: Timer, defaultWidth: 450, defaultHeight: 400 },
-    { id: 'analytics', title: 'Analytics', icon: Icons.Analytics, component: Analytics, defaultWidth: 450, defaultHeight: 400 },
+    { id: 'analytics', title: 'Analytics', icon: Icons.Analytics, component: Analytics, defaultWidth: 770, defaultHeight: 450 },
 ];
 
 const Dock: FC<DockProps> = ({ onIconClick }) => {
