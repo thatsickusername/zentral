@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, FC } from "react";
 import { useSessions } from "../../hooks/useSessions";
 import { Session } from "../../types/Session";
 import HeatMap from "./HeatMap";
+import { useTasks } from "../../hooks/useTasks";
 
 export interface DaySummary{
     count: number
@@ -50,6 +51,23 @@ function groupSessionsByDate(sessions: Session[], year: number): DaySummary[]{
     return summary
 }
 
+interface StatItemProps {
+  label: string;
+  value: string;
+  color?: string;
+}
+
+const StatItem: FC<StatItemProps> = ({ label, value, color = 'text-blue-500' }) => {
+  return (
+    <div className="flex flex-col items-center justify-center p-2 text-center w-1/3">
+      <p className={`text-2xl font-bold ${color}`}>
+        {value}
+      </p>
+      <p className="text-sm text-gray-400">{label}</p>
+    </div>
+  );
+};
+
 
 function OverviewTab() {
 
@@ -57,6 +75,7 @@ function OverviewTab() {
     //loop over the user sessions and make an array of obects with date and number of pomodoros that day and duration of pomodoros
 
     const { sessions } = useSessions();
+    const { tasks } = useTasks()
     const currentYear = new Date().getFullYear();
     const [metric, setMetric] = useState<"count" | "duration">("count");
     const [year, setYear] = useState<number>(currentYear);
@@ -64,37 +83,81 @@ function OverviewTab() {
     const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
     return (
-        <div className="p-4 w-full">
-          <div className="mb-4 flex items-center gap-4">
-            <div>
-              <label className="mr-1 text-sm font-medium">Metric:</label>
-              <select
-                value={metric}
-                onChange={(e) => setMetric(e.target.value as "count" | "duration")}
-                className="border rounded px-2 py-1 text-sm"
-              >
-                <option value="count">Sessions</option>
-                <option value="duration">Focus Time (min)</option>
-              </select>
+        <div className="w-full h-full">
+          
+          <div className="flex w-full mb-6 justify-between">
+            <div className="flex-row bg-white/50 p-4 w-[430px] rounded-xl border border-opacity-30 border-white">
+                <div>
+                  <h2 className=" text-xl font-semibold text-gray-800">
+                  Tasks Summary
+                  </h2>
+                  <div className="w-full h-1/2 flex justify-evenly">
+                      <StatItem label={"created"} value={`${tasks.length}`} color={"text-blue-500"} />
+                      <StatItem label={"completed"} value={`${tasks.length}`} color={"text-blue-500"} />
+                      <StatItem label={"pending"} value={`${tasks.length}`} color={"text-blue-500"} />
+                  </div>
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-800">
+                  Pomodoro Summary
+                  </h2>
+                  <div className="w-full h-1/2 flex justify-evenly">
+                      <StatItem label={"created"} value={`${tasks.length}`} color={"text-blue-500"} />
+                      <StatItem label={"created"} value={`${tasks.length}`} color={"text-blue-500"} />
+                      <StatItem label={"created"} value={`${tasks.length}`} color={"text-blue-500"} />
+                  </div>
+                </div>
             </div>
-    
-            <div>
-              <label className="mr-1 text-sm font-medium">Year:</label>
-              <select
-                value={year}
-                onChange={(e) => setYear(Number(e.target.value))}
-                className="border rounded px-2 py-1 text-sm"
-              >
-                {yearOptions.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-              </select>
+            <div className="bg-white/50 p-4 rounded-xl border border-opacity-30 border-white">
+                <h2 className="text-xl font-semibold text-gray-800 mb-3">
+                Productivity Streak
+                </h2>
+                <div className="text-center">
+                    <p className="text-6xl font-bold text-blue-500">14</p>
+                    <p className="text-gray-500 dark:text-gray-400">day streak</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-4">Longest: 32 days</p>
+                </div>
             </div>
           </div>
-    
-          <HeatMap data={summary} metric={metric} />
+
+          {/* HEATMAP */}
+          <div className="bg-white/50  p-4 w-full rounded-xl border border-opacity-30 border-white">
+            <div className="flex justify-between">
+              <h2 className="text-xl font-semibold text-gray-800 mb-6">
+              Productivity Heatmap
+              </h2>
+              <div className="mb-4 flex items-center gap-4">
+                <div>
+                  <label className="mr-1 text-sm font-medium">Metric:</label>
+                  <select
+                    value={metric}
+                    onChange={(e) => setMetric(e.target.value as "count" | "duration")}
+                    className="border rounded px-2 py-1 text-sm"
+                  >
+                    <option value="count">Sessions</option>
+                    <option value="duration">Focus Time (min)</option>
+                  </select>
+                </div>
+        
+                <div>
+                  <label className="mr-1 text-sm font-medium">Year:</label>
+                  <select
+                    value={year}
+                    onChange={(e) => setYear(Number(e.target.value))}
+                    className="border rounded px-2 py-1 text-sm"
+                  >
+                    {yearOptions.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+      
+            <HeatMap data={summary} metric={metric} />
+          </div>
         </div>
       )
 }
