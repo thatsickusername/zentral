@@ -1,6 +1,7 @@
 import { FC, createContext, useEffect, useState } from "react";
 import { Session } from "../types/Session";
 import { useAuth } from "./useAuth";
+import { Timestamp } from "firebase/firestore";
 import { useFirestore } from "../services/firestore";
 
 export interface SessionContextType {
@@ -69,7 +70,7 @@ export const SessionProvider:FC<SessionProviderProps> = ({children}) => {
     const addSession = (type: "pomodoro" | "break", duration: number, linkedTaskId: string) => {
         const newSession: Session = {
             id: undefined,
-            completedAt: new Date(),
+            completedAt: Timestamp.fromDate(new Date()),
             type: type,
             duration: duration,
             linkedTaskId: linkedTaskId,
@@ -87,6 +88,3 @@ export const SessionProvider:FC<SessionProviderProps> = ({children}) => {
         </SessionContext.Provider>
     )
 }
-
-
-
