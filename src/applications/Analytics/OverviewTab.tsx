@@ -1,4 +1,4 @@
-import { useMemo, useState, FC } from "react";
+import { useMemo, useState, FC, useEffect } from "react";
 import { useSessions } from "../../hooks/useSessions";
 import { Session } from "../../types/Session";
 import HeatMap from "./HeatMap";
@@ -29,8 +29,6 @@ function groupSessionsByDate(sessions: Session[], year: number): DaySummary[]{
                     count: prev.count + 1,
                     duration: prev.duration + session.duration
                 })
-
-        console.log(session)
     })
 
     const summary: DaySummary[] = []
@@ -53,7 +51,7 @@ function groupSessionsByDate(sessions: Session[], year: number): DaySummary[]{
 
 interface StatItemProps {
   label: string;
-  value: string;
+  value: number;
   color?: string;
 }
 
@@ -71,16 +69,33 @@ const StatItem: FC<StatItemProps> = ({ label, value, color = 'text-blue-500' }) 
 
 function OverviewTab() {
 
-    //get the session data from the context
-    //loop over the user sessions and make an array of obects with date and number of pomodoros that day and duration of pomodoros
-
-    const { sessions } = useSessions();
+    const { sessions, sessionsCount, totalDuration} = useSessions();
     const { tasks } = useTasks()
     const currentYear = new Date().getFullYear();
     const [metric, setMetric] = useState<"count" | "duration">("count");
     const [year, setYear] = useState<number>(currentYear);
     const summary = useMemo(() => groupSessionsByDate(sessions, year), [sessions, year]);
     const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - i);
+    const [tasksCreated, setTasksCreated] = useState(0);
+    const [tasksCompleted, setTasksCompleted] = useState(0);
+    const [tasksPending, setTasksPending] = useState(0);
+    const [sessionsCompleted, setSessionsCompleted] = useState(0);
+    // const [avgSessionDaily, setAvgSessionDaily] = useState(0);
+    // const [avgSessionLength, setAvgSessionLength] = useState(0);
+
+
+    useEffect(()=>{
+      setTasksCreated(tasks.length)
+      for(const task of tasks){
+        if(task.completed) setTasksCompleted(prev => prev+1)
+        else setTasksPending(prev => prev+1)
+      }
+    }, [tasks])
+
+    useEffect(()=>{
+      setSessionsCompleted(sessionsCount)
+    },[sessionsCount])
+
 
     return (
         <div className="w-full h-full">
@@ -92,9 +107,9 @@ function OverviewTab() {
                   Tasks Summary
                   </h2>
                   <div className="w-full h-1/2 flex justify-evenly">
-                      <StatItem label={"created"} value={`${tasks.length}`} color={"text-blue-500"} />
-                      <StatItem label={"completed"} value={`${tasks.length}`} color={"text-blue-500"} />
-                      <StatItem label={"pending"} value={`${tasks.length}`} color={"text-blue-500"} />
+                      <StatItem label={"Created"} value={tasksCreated} color={"text-blue-500"} />
+                      <StatItem label={"Completed"} value={tasksCompleted} color={"text-blue-500"} />
+                      <StatItem label={"Pending"} value={tasksPending} color={"text-blue-500"} />
                   </div>
                 </div>
                 <div>
@@ -102,9 +117,9 @@ function OverviewTab() {
                   Pomodoro Summary
                   </h2>
                   <div className="w-full h-1/2 flex justify-evenly">
-                      <StatItem label={"created"} value={`${tasks.length}`} color={"text-blue-500"} />
-                      <StatItem label={"created"} value={`${tasks.length}`} color={"text-blue-500"} />
-                      <StatItem label={"created"} value={`${tasks.length}`} color={"text-blue-500"} />
+                      <StatItem label={"Total Sessions"} value={sessionsCompleted} color={"text-blue-500"} />
+                      <StatItem label={"Total Duration"} value={totalDuration} color={"text-blue-500"} />
+                      <StatItem label={"Avg Length"} value={tasksPending} color={"text-blue-500"} />
                   </div>
                 </div>
             </div>
@@ -114,7 +129,7 @@ function OverviewTab() {
                 </h2>
                 <div className="text-center">
                     <p className="text-6xl font-bold text-blue-500">14</p>
-                    <p className="text-gray-500 dark:text-gray-400">day streak</p>
+                    <p className="text-gray-500 dark:text-gray-400">Day Streak</p>
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-4">Longest: 32 days</p>
                 </div>
             </div>

@@ -8,6 +8,8 @@ export interface SessionContextType {
     sessions: Session[]
     isLoading: boolean
     isSyncing: boolean
+    sessionsCount: number
+    totalDuration: number
     addSession: (type: "pomodoro" | "break", duration: number, linkedTaskId: string) => void
     setSessions: React.Dispatch<React.SetStateAction<Session[]>>
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
@@ -23,6 +25,8 @@ export const SessionProvider:FC<SessionProviderProps> = ({children}) => {
     const [sessions, setSessions] = useState<Session[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [isSyncing, setIsSyncing] = useState(false)
+    const [sessionsCount, setSessionsCount] = useState(0)
+    const [totalDuration, setTotalDuration] = useState(0)
 
     const {user} = useAuth()
     const {fetchAllSessions, syncSesions} = useFirestore()
@@ -42,6 +46,15 @@ export const SessionProvider:FC<SessionProviderProps> = ({children}) => {
         console.log("sessions currently", sessions)
         loadSessions()
     },[user?.uid])
+
+    useEffect(()=>{
+        let counter = 0; 
+        sessions.forEach((session)=>{
+            if (session.type !== "pomodoro") counter++
+        })
+        setSessionsCount(counter)
+    },[sessions])
+
 
     useEffect(()=>{
         if(!user?.uid) return 
@@ -68,6 +81,7 @@ export const SessionProvider:FC<SessionProviderProps> = ({children}) => {
     }, [sessions, user])
 
     const addSession = (type: "pomodoro" | "break", duration: number, linkedTaskId: string) => {
+        setTotalDuration(prev => prev + duration)
         const newSession: Session = {
             id: undefined,
             completedAt: Timestamp.fromDate(new Date()),
@@ -83,7 +97,7 @@ export const SessionProvider:FC<SessionProviderProps> = ({children}) => {
     }
 
     return (
-        <SessionContext.Provider value={{sessions, isLoading, isSyncing, addSession, setSessions, setIsLoading}}>
+        <SessionContext.Provider value={{sessions, isLoading, isSyncing, sessionsCount, totalDuration, addSession, setSessions, setIsLoading}}>
             {!isLoading &&  children}
         </SessionContext.Provider>
     )
