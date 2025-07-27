@@ -51,7 +51,7 @@ function groupSessionsByDate(sessions: Session[], year: number): DaySummary[]{
 
 interface StatItemProps {
   label: string;
-  value: number;
+  value: string;
   color?: string;
 }
 
@@ -69,7 +69,7 @@ const StatItem: FC<StatItemProps> = ({ label, value, color = 'text-blue-500' }) 
 
 function OverviewTab() {
 
-    const { sessions, sessionsCount, totalDuration} = useSessions();
+    const { sessions, sessionMetrics} = useSessions();
     const { tasks } = useTasks()
     const currentYear = new Date().getFullYear();
     const [metric, setMetric] = useState<"count" | "duration">("count");
@@ -79,10 +79,6 @@ function OverviewTab() {
     const [tasksCreated, setTasksCreated] = useState(0);
     const [tasksCompleted, setTasksCompleted] = useState(0);
     const [tasksPending, setTasksPending] = useState(0);
-    const [sessionsCompleted, setSessionsCompleted] = useState(0);
-    // const [avgSessionDaily, setAvgSessionDaily] = useState(0);
-    // const [avgSessionLength, setAvgSessionLength] = useState(0);
-
 
     useEffect(()=>{
       setTasksCreated(tasks.length)
@@ -92,9 +88,19 @@ function OverviewTab() {
       }
     }, [tasks])
 
-    useEffect(()=>{
-      setSessionsCompleted(sessionsCount)
-    },[sessionsCount])
+    function displayDuration(secondsInput: number): string {
+      const totalSeconds = Math.floor(secondsInput); // Remove decimals
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+  
+      const parts: string[] = [];
+      if (hours > 0) parts.push(`${hours}h`);
+      if (minutes > 0) parts.push(`${minutes}m`);
+      if (hours < 0 && seconds > 0 || parts.length === 0) parts.push(`${seconds}s`);
+  
+      return parts.join(' ');
+  }
 
 
     return (
@@ -107,9 +113,9 @@ function OverviewTab() {
                   Tasks Summary
                   </h2>
                   <div className="w-full h-1/2 flex justify-evenly">
-                      <StatItem label={"Created"} value={tasksCreated} color={"text-blue-500"} />
-                      <StatItem label={"Completed"} value={tasksCompleted} color={"text-blue-500"} />
-                      <StatItem label={"Pending"} value={tasksPending} color={"text-blue-500"} />
+                      <StatItem label={"Created"} value={tasksCreated.toString()} color={"text-blue-500"} />
+                      <StatItem label={"Completed"} value={tasksCompleted.toString()} color={"text-blue-500"} />
+                      <StatItem label={"Pending"} value={tasksPending.toString()} color={"text-blue-500"} />
                   </div>
                 </div>
                 <div>
@@ -117,9 +123,9 @@ function OverviewTab() {
                   Pomodoro Summary
                   </h2>
                   <div className="w-full h-1/2 flex justify-evenly">
-                      <StatItem label={"Total Sessions"} value={sessionsCompleted} color={"text-blue-500"} />
-                      <StatItem label={"Total Duration"} value={totalDuration} color={"text-blue-500"} />
-                      <StatItem label={"Avg Length"} value={tasksPending} color={"text-blue-500"} />
+                      <StatItem label={"Total Sessions"} value={sessionMetrics.pomodoroCount.toString()} color={"text-blue-500"} />
+                      <StatItem label={"Total Duration"} value={sessionMetrics.totalPomodoroDuration.toString()} color={"text-blue-500"} />
+                      <StatItem label={"Avg Length"} value={displayDuration(sessionMetrics.avgSessionLength)} color={"text-blue-500"} />
                   </div>
                 </div>
             </div>

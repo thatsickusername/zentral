@@ -3,13 +3,13 @@ import { Session } from "../types/Session";
 import { useAuth } from "./useAuth";
 import { Timestamp } from "firebase/firestore";
 import { useFirestore } from "../services/firestore";
+import { SessionMetrics } from "../types/SessionMetrics";
 
-export interface SessionContextType {
+export interface SessionContextType{
     sessions: Session[]
     isLoading: boolean
     isSyncing: boolean
-    sessionsCount: number
-    totalDuration: number
+    sessionMetrics: SessionMetrics
     addSession: (type: "pomodoro" | "break", duration: number, linkedTaskId: string) => void
     setSessions: React.Dispatch<React.SetStateAction<Session[]>>
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
@@ -25,34 +25,73 @@ export const SessionProvider:FC<SessionProviderProps> = ({children}) => {
     const [sessions, setSessions] = useState<Session[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [isSyncing, setIsSyncing] = useState(false)
-    const [sessionsCount, setSessionsCount] = useState(0)
-    const [totalDuration, setTotalDuration] = useState(0)
+    const [sessionMetrics, setSessionMetrics] = useState<SessionMetrics>({
+        pomodoroCount: 0,
+        breakCount: 0,
+        totalPomodoroDuration: 0,
+        totalBreakDuration: 0,
+        avgSessionLength: 0,
+    })
+    const [isMetricUpdated, setIsMetricUpdated] = useState(false)
 
     const {user} = useAuth()
-    const {fetchAllSessions, syncSesions} = useFirestore()
+    const {fetchAllSessions, syncSessions, syncSessionMetrics, fetchSessionMetrics} = useFirestore()
 
-    useEffect(()=>{
-        const loadSessions = async () => {
-            if(!user?.uid) return;
-            try {
-                const fetchedSessions = await fetchAllSessions(user.uid)
-                setSessions(fetchedSessions)
-            } catch (error) {
-                console.log("error loading sessions", error)
-            } finally {
-                setIsLoading(false)
+    useEffect(() => {
+        const loadAll = async () => {
+          if (!user?.uid) return;
+      
+          try {
+            const [fetchedSessions, storedMetrics] = await Promise.all([
+              fetchAllSessions(user.uid),
+              fetchSessionMetrics(user.uid)
+            ])
+      
+            setSessions(fetchedSessions)
+            if (storedMetrics) {
+              setSessionMetrics(storedMetrics)
+              setIsMetricUpdated(false)
             }
+      
+          } catch (err) {
+            console.error("Error loading sessions or metrics", err)
+          } finally {
+            setIsLoading(false)
+          }
         }
-        console.log("sessions currently", sessions)
-        loadSessions()
-    },[user?.uid])
+      
+        loadAll()
+      }, [user?.uid])
 
     useEffect(()=>{
-        let counter = 0; 
-        sessions.forEach((session)=>{
-            if (session.type !== "pomodoro") counter++
+        let pomodoroCount = 0
+        let breakCount = 0
+        let totalPomodoroDuration = 0
+        let totalBreakDuration = 0
+
+        sessions.forEach(session => {
+            if (session.type === "pomodoro") {
+            pomodoroCount++
+            totalPomodoroDuration += session.duration
+            } else {
+            breakCount++
+            totalBreakDuration += session.duration
+            }
         })
-        setSessionsCount(counter)
+
+        const avg = pomodoroCount === 0
+            ? 0
+            : totalPomodoroDuration / pomodoroCount
+
+        setSessionMetrics({
+            pomodoroCount,
+            breakCount,
+            totalPomodoroDuration,
+            totalBreakDuration,
+            avgSessionLength: avg,
+        })
+
+        setIsMetricUpdated(true)
     },[sessions])
 
 
@@ -65,7 +104,7 @@ export const SessionProvider:FC<SessionProviderProps> = ({children}) => {
 
             setIsSyncing(true)
             try{
-                await syncSesions(user.uid, unSyncedSessions)
+                await syncSessions(user.uid, unSyncedSessions)
                 setSessions((prev) => 
                     prev.map((s)=> !s.id ? {...s, id: "synced-" + Math.random().toString()}: s)
                 )
@@ -80,8 +119,21 @@ export const SessionProvider:FC<SessionProviderProps> = ({children}) => {
         return ()=> clearInterval(interval)
     }, [sessions, user])
 
+    useEffect(()=>{
+        if(!user?.uid) return
+
+        const interval = setInterval(()=>{
+            if (!isMetricUpdated) return
+
+            syncSessionMetrics(user.uid, sessionMetrics)
+                .then(()=> setIsMetricUpdated(false))
+                .catch(()=> setIsMetricUpdated(true))
+        }, 10000)
+
+        return ()=> clearInterval(interval)
+    },[isMetricUpdated, user?.uid, sessionMetrics])
+
     const addSession = (type: "pomodoro" | "break", duration: number, linkedTaskId: string) => {
-        setTotalDuration(prev => prev + duration)
         const newSession: Session = {
             id: undefined,
             completedAt: Timestamp.fromDate(new Date()),
@@ -97,7 +149,7 @@ export const SessionProvider:FC<SessionProviderProps> = ({children}) => {
     }
 
     return (
-        <SessionContext.Provider value={{sessions, isLoading, isSyncing, sessionsCount, totalDuration, addSession, setSessions, setIsLoading}}>
+        <SessionContext.Provider value={{sessions, isLoading, isSyncing, sessionMetrics, addSession, setSessions, setIsLoading}}>
             {!isLoading &&  children}
         </SessionContext.Provider>
     )

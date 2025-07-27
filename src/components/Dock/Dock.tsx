@@ -43,9 +43,9 @@ const Icons = {
     ),
     Analytics: (props: React.SVGProps<SVGSVGElement>) => (
         <svg {...props} xmlns="http://www.w3.org/2000/svg"  width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="2" y="12" width="6" height="8" rx="1" stroke="currentColor" stroke-width="2" fill="none"/>
-            <rect x="8" y="7" width="6" height="13" rx="1" stroke="currentColor" stroke-width="2" fill="none"/>
-            <rect x="14" y="2" width="6" height="18" rx="1" stroke="currentColor" stroke-width="2" fill="none"/>
+            <rect x="2" y="12" width="6" height="8" rx="1" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <rect x="8" y="7" width="6" height="13" rx="1" stroke="currentColor" strokeWidth="2" fill="none"/>
+            <rect x="14" y="2" width="6" height="18" rx="1" stroke="currentColor" strokeWidth="2" fill="none"/>
         </svg>
 
     )

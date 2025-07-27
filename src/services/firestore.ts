@@ -2,6 +2,7 @@ import {db} from "./firebase"
 import { collection, setDoc, doc, getDoc, serverTimestamp, getDocs, writeBatch } from 'firebase/firestore'
 import { Task } from "../types/Tasks";
 import { Session } from "../types/Session";
+import { SessionMetrics } from "../types/SessionMetrics";
 
 interface UserInfo {
   uid: string;
@@ -89,7 +90,7 @@ export const useFirestore = ()=>{
         })) as Session[]
     }
 
-    const syncSesions = async (uid: string, sessions: Session[]): Promise<void> => {
+    const syncSessions = async (uid: string, sessions: Session[]): Promise<void> => {
         const batch = writeBatch(db);
         const sessionsCollection = collection(db, "users", uid, "sessions");
 
@@ -107,6 +108,36 @@ export const useFirestore = ()=>{
         await batch.commit()
     }
 
+    const fetchSessionMetrics = async(uid: string):Promise<SessionMetrics | null> =>{
+        try{
+          const sessionMetricRef = doc(db, "users", uid, "metrics", "sessionMetrics")
+          const docSnap = await getDoc(sessionMetricRef);
 
-    return { checkIfInUser, fetchAllTasks, syncTasks, fetchAllSessions, syncSesions}
+          if(docSnap.exists()){
+            const data = docSnap.data();
+            return {
+              pomodoroCount: data.pomodoroCount ?? 0,
+              breakCount: data.breakCount ?? 0,
+              totalPomodoroDuration: data.totalPomodoroDuration ?? 0,
+              totalBreakDuration: data.totalBreakDuration ?? 0,
+              avgSessionLength: data.avgSessionLength ?? 0
+            }
+          }else {
+            return null
+          } 
+        } catch(error) {
+          console.error("Error fetching session metrics:", error);
+          throw error;
+        }
+      }
+
+    const syncSessionMetrics = async (uid: string, metrics: SessionMetrics): Promise<void> =>{
+      const sessionMetricRef = doc(db, "users", uid, "metrics", "sessionMetrics")
+      await setDoc(sessionMetricRef, { 
+        ...metrics,
+        updatedAt: serverTimestamp()
+      }, {merge: true})
+    }
+
+    return { checkIfInUser, fetchAllTasks, syncTasks, fetchAllSessions, syncSessions, fetchSessionMetrics, syncSessionMetrics}
 }
