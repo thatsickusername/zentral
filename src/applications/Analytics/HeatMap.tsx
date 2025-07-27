@@ -5,12 +5,20 @@ type HeatmapProps = {
     metric: "count" | "duration";
 };
 
-function getMapColor(value: number): string {
-    if (value === 0) return "bg-gray-500";
+function getMapColor(value: number, metric: string): string {
+  if( metric === "count"){
+    if (value === 0) return "bg-gray-300";
     if (value <= 2) return "bg-green-300";
     if (value <= 5) return "bg-green-500";
     if (value <= 8) return "bg-green-700";
     return "bg-green-700";
+  }else{
+    if (value === 0) return "bg-gray-300";
+    if (value <= 10 * 60) return "bg-green-300";
+    if (value <= 30 * 60) return "bg-green-500";
+    if (value <= 60 * 60) return "bg-green-700";
+    return "bg-green-700";
+  }   
 }
 
 const HeatMap: React.FC<HeatmapProps> = ({ data, metric }) => {
@@ -30,7 +38,7 @@ const HeatMap: React.FC<HeatmapProps> = ({ data, metric }) => {
                 <div
                   key={dIdx}
                   title={`${day.date} — ${day.count} sessions, ${day.duration} min`}
-                  className={`w-[10px] h-[10px] rounded-sm ${getMapColor(value)}`}
+                  className={`w-[10px] h-[10px] rounded-sm ${getMapColor(value, metric)}`}
                 />
               );
             })}

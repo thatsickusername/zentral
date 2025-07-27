@@ -31,6 +31,9 @@ export const SessionProvider:FC<SessionProviderProps> = ({children}) => {
         totalPomodoroDuration: 0,
         totalBreakDuration: 0,
         avgSessionLength: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        lastSessionDate: "",
     })
     const [isMetricUpdated, setIsMetricUpdated] = useState(false)
 
@@ -83,12 +86,15 @@ export const SessionProvider:FC<SessionProviderProps> = ({children}) => {
             ? 0
             : totalPomodoroDuration / pomodoroCount
 
-        setSessionMetrics({
-            pomodoroCount,
-            breakCount,
-            totalPomodoroDuration,
-            totalBreakDuration,
-            avgSessionLength: avg,
+        setSessionMetrics(prev => {
+            return {
+                ...prev,
+                pomodoroCount,
+                breakCount,
+                totalPomodoroDuration,
+                totalBreakDuration,
+                avgSessionLength: avg,
+            }
         })
 
         setIsMetricUpdated(true)
@@ -134,17 +140,51 @@ export const SessionProvider:FC<SessionProviderProps> = ({children}) => {
     },[isMetricUpdated, user?.uid, sessionMetrics])
 
     const addSession = (type: "pomodoro" | "break", duration: number, linkedTaskId: string) => {
+
+        const now = new Date();
+        const todayStr = now.toISOString().split('T')[0]
+
         const newSession: Session = {
             id: undefined,
-            completedAt: Timestamp.fromDate(new Date()),
+            completedAt: Timestamp.fromDate(new Date(now)),
             type: type,
             duration: duration,
             linkedTaskId: linkedTaskId,
         }
         setSessions((prev) => {
-            console.log("updated Sessions", [...prev, newSession])
             return [...prev, newSession]
         })
+
+        setSessionMetrics(prev => {
+            let newCurrent = prev.currentStreak || 0;
+            let newLongest = prev.longestStreak || 0;
+
+            const lastDate = prev.lastSessionDate;
+            if(lastDate) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+                if (lastDate === yesterdayStr) {
+                    newCurrent++; //streak increased
+                    newLongest = Math.max(newLongest, newCurrent)
+                }else{
+                    newCurrent = 1; // streak broken
+                }
+            }else {
+                newCurrent = 1; // first ever session
+                newLongest = 1; // first ever session
+            }
+
+            return {
+                ...prev,
+                lastSessionDate: todayStr,
+                currentStreak: newCurrent,
+                longestStreak: newLongest,
+            }
+        })
+
+        setIsMetricUpdated(true)
         
     }
 

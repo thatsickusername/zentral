@@ -134,9 +134,9 @@ function OverviewTab() {
                 Productivity Streak
                 </h2>
                 <div className="text-center">
-                    <p className="text-6xl font-bold text-blue-500">14</p>
+                    <p className="text-6xl font-bold text-blue-500">{sessionMetrics.currentStreak}</p>
                     <p className="text-gray-500 dark:text-gray-400">Day Streak</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-4">Longest: 32 days</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-4">Longest: {sessionMetrics.longestStreak} days</p>
                 </div>
             </div>
           </div>

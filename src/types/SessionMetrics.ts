@@ -4,4 +4,7 @@ export interface SessionMetrics {
     totalPomodoroDuration: number;
     totalBreakDuration: number;
     avgSessionLength: number;
+    longestStreak: number;
+    currentStreak: number;
+    lastSessionDate: string;
 }

@@ -120,7 +120,10 @@ export const useFirestore = ()=>{
               breakCount: data.breakCount ?? 0,
               totalPomodoroDuration: data.totalPomodoroDuration ?? 0,
               totalBreakDuration: data.totalBreakDuration ?? 0,
-              avgSessionLength: data.avgSessionLength ?? 0
+              avgSessionLength: data.avgSessionLength ?? 0,
+              longestStreak: data.longestStreak ?? 0,
+              currentStreak: data.currentStreak ?? 0,
+              lastSessionDate: data.lastSessionDate?.toDate?.() ?? null,
             }
           }else {
             return null
