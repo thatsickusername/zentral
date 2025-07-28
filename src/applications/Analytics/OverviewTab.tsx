@@ -1,4 +1,4 @@
-import { useMemo, useState, FC, useEffect } from "react";
+import { useMemo, useState, FC } from "react";
 import { useSessions } from "../../hooks/useSessions";
 import { Session } from "../../types/Session";
 import HeatMap from "./HeatMap";
@@ -70,23 +70,12 @@ const StatItem: FC<StatItemProps> = ({ label, value, color = 'text-blue-500' }) 
 function OverviewTab() {
 
     const { sessions, sessionMetrics} = useSessions();
-    const { tasks } = useTasks()
+    const {taskMetrics} = useTasks()
     const currentYear = new Date().getFullYear();
     const [metric, setMetric] = useState<"count" | "duration">("count");
     const [year, setYear] = useState<number>(currentYear);
     const summary = useMemo(() => groupSessionsByDate(sessions, year), [sessions, year]);
     const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - i);
-    const [tasksCreated, setTasksCreated] = useState(0);
-    const [tasksCompleted, setTasksCompleted] = useState(0);
-    const [tasksPending, setTasksPending] = useState(0);
-
-    useEffect(()=>{
-      setTasksCreated(tasks.length)
-      for(const task of tasks){
-        if(task.completed) setTasksCompleted(prev => prev+1)
-        else setTasksPending(prev => prev+1)
-      }
-    }, [tasks])
 
     function displayDuration(secondsInput: number): string {
       const totalSeconds = Math.floor(secondsInput); // Remove decimals
@@ -113,9 +102,9 @@ function OverviewTab() {
                   Tasks Summary
                   </h2>
                   <div className="w-full h-1/2 flex justify-evenly">
-                      <StatItem label={"Created"} value={tasksCreated.toString()} color={"text-blue-500"} />
-                      <StatItem label={"Completed"} value={tasksCompleted.toString()} color={"text-blue-500"} />
-                      <StatItem label={"Pending"} value={tasksPending.toString()} color={"text-blue-500"} />
+                      <StatItem label={"Created"} value={taskMetrics.totalTasksCreated.toString()} color={"text-blue-500"} />
+                      <StatItem label={"Completed"} value={taskMetrics.totalTasksCompleted.toString()} color={"text-blue-500"} />
+                      <StatItem label={"Completion Rate"} value={`${taskMetrics.completionRate.toString()}%`} color={"text-blue-500"} />
                   </div>
                 </div>
                 <div>

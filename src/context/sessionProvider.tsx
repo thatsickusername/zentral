@@ -22,6 +22,9 @@ interface SessionProviderProps {
 }
 
 export const SessionProvider:FC<SessionProviderProps> = ({children}) => {
+    const {user} = useAuth()
+    const {fetchAllSessions, syncSessions, syncSessionMetrics, fetchSessionMetrics} = useFirestore()
+
     const [sessions, setSessions] = useState<Session[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [isSyncing, setIsSyncing] = useState(false)
@@ -37,9 +40,7 @@ export const SessionProvider:FC<SessionProviderProps> = ({children}) => {
     })
     const [isMetricUpdated, setIsMetricUpdated] = useState(false)
 
-    const {user} = useAuth()
-    const {fetchAllSessions, syncSessions, syncSessionMetrics, fetchSessionMetrics} = useFirestore()
-
+    
     useEffect(() => {
         const loadAll = async () => {
           if (!user?.uid) return;
@@ -134,7 +135,7 @@ export const SessionProvider:FC<SessionProviderProps> = ({children}) => {
             syncSessionMetrics(user.uid, sessionMetrics)
                 .then(()=> setIsMetricUpdated(false))
                 .catch(()=> setIsMetricUpdated(true))
-        }, 10000)
+        }, 5000)
 
         return ()=> clearInterval(interval)
     },[isMetricUpdated, user?.uid, sessionMetrics])

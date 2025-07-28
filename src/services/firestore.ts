@@ -3,6 +3,7 @@ import { collection, setDoc, doc, getDoc, serverTimestamp, getDocs, writeBatch }
 import { Task } from "../types/Tasks";
 import { Session } from "../types/Session";
 import { SessionMetrics } from "../types/SessionMetrics";
+import { TaskMetrics } from "../types/TaskMetrics";
 
 interface UserInfo {
   uid: string;
@@ -108,6 +109,37 @@ export const useFirestore = ()=>{
         await batch.commit()
     }
 
+    const fetchTaskMetrics = async(uid: string):Promise<TaskMetrics | null> =>{
+      try{
+        const taskMetricRef = doc(db, "users", uid, "metrics", "taskMetrics")
+        const docSnap = await getDoc(taskMetricRef);
+
+        if(docSnap.exists()){
+          const data = docSnap.data();
+          return {
+            totalTasksCreated: data.totalTasksCreated ?? 0,
+            totalTasksCompleted: data.totalTasksCompleted ?? 0,
+            activeTasks: data.activeTasks ?? 0,
+            completionRate: data.completionRate ?? 0,
+          }
+        }else {
+          return null
+        } 
+      } catch(error) {
+        console.error("Error fetching session metrics:", error);
+        throw error;
+      }
+    }
+
+  const syncTaskMetrics = async (uid: string, metrics: TaskMetrics): Promise<void> =>{
+    const taskMetricRef = doc(db, "users", uid, "metrics", "taskMetrics")
+    await setDoc(taskMetricRef, { 
+      ...metrics,
+      updatedAt: serverTimestamp()
+    }, {merge: true})
+  }
+
+
     const fetchSessionMetrics = async(uid: string):Promise<SessionMetrics | null> =>{
         try{
           const sessionMetricRef = doc(db, "users", uid, "metrics", "sessionMetrics")
@@ -142,5 +174,5 @@ export const useFirestore = ()=>{
       }, {merge: true})
     }
 
-    return { checkIfInUser, fetchAllTasks, syncTasks, fetchAllSessions, syncSessions, fetchSessionMetrics, syncSessionMetrics}
+    return { checkIfInUser, fetchAllTasks, syncTasks, fetchAllSessions, syncSessions,fetchTaskMetrics, syncTaskMetrics, fetchSessionMetrics, syncSessionMetrics}
 }

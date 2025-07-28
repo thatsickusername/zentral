@@ -2,11 +2,13 @@ import { FC, createContext, useEffect, useState } from "react";
 import { Task } from "../types/Tasks";
 import { useAuth } from "./useAuth";
 import {useFirestore} from '../services/firestore'
+import { TaskMetrics } from "../types/TaskMetrics";
 
 export interface TaskContextType {
     tasks: Task[]
     isLoading: boolean
     isSyncing: boolean
+    taskMetrics: TaskMetrics
     setTasks: React.Dispatch<React.SetStateAction<Task[]>>
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
     addTask: (content: string) => void;
@@ -22,29 +24,75 @@ interface TaskProviderProps {
 }
 
 export const TaskProvider:FC<TaskProviderProps> = ({children}) =>{
+    const {user} = useAuth()
+    const {fetchAllTasks, syncTasks, fetchTaskMetrics, syncTaskMetrics} = useFirestore()
+
     const [tasks, setTasks] = useState<Task[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [isSyncing, setIsSyncing] = useState(false)
+    const [taskMetrics, setTaskMetrics] = useState<TaskMetrics>({
+        totalTasksCreated: 0,
+        totalTasksCompleted: 0,
+        activeTasks: 0,
+        completionRate: 0,
+    })
+    const [isMetricUpdated, setIsMetricUpdated] = useState(false)
 
-    const {user} = useAuth()
-    const {fetchAllTasks, syncTasks} = useFirestore()
+    
 
     useEffect(()=>{
-        const loadTasks = async()=>{
+        const loadAll = async()=>{
             if(!user?.uid) return
 
             try{
-                const fetchedTasks = await fetchAllTasks(user.uid)
+                const [fetchedTasks, storedMetrics] = await Promise.all([
+                    fetchAllTasks(user.uid),
+                    fetchTaskMetrics(user.uid)
+                ])
+        
                 setTasks(fetchedTasks)
+                if (storedMetrics) {
+                    setTaskMetrics(storedMetrics)
+                    setIsMetricUpdated(false)
+                }
             }catch(error){
-                console.log(error)
+                console.error("Error loading tasks or metrics", error)
             }finally{
                 setIsLoading(false)
             }
         }
 
-        loadTasks()
+        loadAll()
     }, [user?.uid])
+
+    useEffect(()=>{
+        let totalTasksCreated = 0
+        let totalTasksCompleted = 0
+        let activeTasks = 0
+        let completionRate = 0
+
+        tasks.forEach(task => {
+            totalTasksCreated++
+            if(task.completed){
+                totalTasksCompleted++
+            } 
+            else activeTasks++
+        })
+
+        completionRate = (totalTasksCompleted/totalTasksCreated)*100
+
+        setTaskMetrics(prev => {
+            return {
+                ...prev,
+                totalTasksCreated,
+                totalTasksCompleted,
+                activeTasks,
+                completionRate,
+            }
+        })
+        setIsMetricUpdated(true)
+    },[tasks])
+
 
     useEffect(()=>{
         if(!user?.uid) return
@@ -74,6 +122,20 @@ export const TaskProvider:FC<TaskProviderProps> = ({children}) =>{
 
         return ()=> clearInterval(interval)
     }, [tasks, user])
+
+    useEffect(()=>{
+        if(!user?.uid) return
+
+        const interval = setInterval(()=>{
+            if (!isMetricUpdated) return
+
+            syncTaskMetrics(user.uid, taskMetrics)
+                .then(()=> setIsMetricUpdated(false))
+                .catch(()=> setIsMetricUpdated(true))
+        }, 5000)
+
+        return ()=> clearInterval(interval)
+    },[isMetricUpdated, user?.uid, taskMetrics])
 
     //addtask
     const addTask = (content: string) => {
@@ -130,7 +192,7 @@ export const TaskProvider:FC<TaskProviderProps> = ({children}) =>{
     }
 
     return (
-        <TaskContext.Provider value={{tasks, setTasks, isLoading, isSyncing, setIsLoading, addTask, toggleTask, editTask, removeTask}}>
+        <TaskContext.Provider value={{tasks, taskMetrics, setTasks, isLoading, isSyncing, setIsLoading, addTask, toggleTask, editTask, removeTask}}>
             {!isLoading && children}
         </TaskContext.Provider>
     );
