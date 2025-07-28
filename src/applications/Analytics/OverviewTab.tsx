@@ -55,7 +55,7 @@ interface StatItemProps {
   color?: string;
 }
 
-const StatItem: FC<StatItemProps> = ({ label, value, color = 'text-blue-500' }) => {
+export const StatItem: FC<StatItemProps> = ({ label, value, color = 'text-blue-500' }) => {
   return (
     <div className="flex flex-col items-center justify-center p-2 text-center w-1/3">
       <p className={`text-2xl font-bold ${color}`}>
@@ -103,7 +103,7 @@ function OverviewTab() {
                   </h2>
                   <div className="w-full h-1/2 flex justify-evenly">
                       <StatItem label={"Created"} value={taskMetrics.totalTasksCreated.toString()} color={"text-blue-500"} />
-                      <StatItem label={"Completed"} value={taskMetrics.totalTasksCompleted.toString()} color={"text-blue-500"} />
+                      <StatItem label={"Pending"} value={taskMetrics.activeTasks.toString()} color={"text-blue-500"} />
                       <StatItem label={"Completion Rate"} value={`${taskMetrics.completionRate.toString()}%`} color={"text-blue-500"} />
                   </div>
                 </div>
