@@ -99,7 +99,7 @@ function OverviewTab() {
                   </h2>
                   <div className="w-full h-1/2 flex justify-evenly">
                       <StatItem label={"Total Sessions"} value={sessionMetrics.pomodoroCount.toString()} color={"text-blue-500"} />
-                      <StatItem label={"Total Duration"} value={sessionMetrics.totalPomodoroDuration.toString()} color={"text-blue-500"} />
+                      <StatItem label={"Total Duration"} value={displayDuration(sessionMetrics.totalPomodoroDuration)} color={"text-blue-500"} />
                       <StatItem label={"Avg Length"} value={displayDuration(sessionMetrics.avgSessionLength)} color={"text-blue-500"} />
                   </div>
                 </div>

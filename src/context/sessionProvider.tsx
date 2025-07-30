@@ -58,6 +58,28 @@ export const SessionProvider: FC<SessionProviderProps> = ({ children }) => {
 
   const [dailyGoals, setDailyGoalsState] = useState<DailyGoals | null>(null);
 
+  useEffect(() => {
+    const resetIfNewDay = () => {
+      const todayStr = new Date().toISOString().split("T")[0];
+      if (dailyMetrics.todayDate !== todayStr) {
+        // Reset daily metrics
+        setDailyMetrics({
+          todayDate: todayStr,
+          sessionCountToday: 0,
+          sessionDurationToday: 0,
+        });
+      }
+    };
+  
+    // Run once on mount
+    resetIfNewDay();
+  
+    // Also run periodically (every 1 minute is enough)
+    const interval = setInterval(resetIfNewDay, 60 * 1000);
+  
+    return () => clearInterval(interval);
+  }, [dailyMetrics.todayDate]);
+
   // Load sessions + daily goals
   useEffect(() => {
     const loadAll = async () => {
