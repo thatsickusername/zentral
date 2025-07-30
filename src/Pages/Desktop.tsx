@@ -27,6 +27,7 @@ interface WindowInstance extends AppDefinition {
     zIndex: number;
     width: number;
     height: number;
+    isVisible: boolean;
 }
 
 
@@ -41,6 +42,11 @@ const Desktop = () => {
         // for if the app is already opened in a window, focus that window
         const existingWindow = windows.find(w => w.id === app.id);
         if (existingWindow) {
+            setWindows(prev =>
+                prev.map(w =>
+                    w.id === app.id ? { ...w, isVisible: true } : w
+                )
+            );
             focusWindow(app.id);
             return;
         }
@@ -52,6 +58,7 @@ const Desktop = () => {
             // Use default sizes from the app definition, with a fallback
             width: app.defaultWidth || 400,
             height: app.defaultHeight || 250,
+            isVisible: true
         };
 
         // add the opened app in current windows and update zCounter +1 for next app to be focused
@@ -60,8 +67,11 @@ const Desktop = () => {
     };
 
     const closeWindow = (id: string) => {
-        // remove the closed app id from windows  
-        setWindows(prevWindows => prevWindows.filter(w => w.id !== id));
+        setWindows(prevWindows =>
+            prevWindows.map(w =>
+                w.id === id ? { ...w, isVisible: false } : w
+            )
+        );
     };
     
     const focusWindow = (id: string) => {
@@ -89,20 +99,21 @@ const Desktop = () => {
             {windows.map(win => {
                 const AppComponent = win.component;
                 return (
-                    <Window
-                        key={win.id}
-                        id={win.id}
-                        title={win.title}
-                        initialPosition={win.position}
-                        zIndex={win.zIndex}
-                        width={win.width}
-                        height={win.height}
-                        onClose={closeWindow}
-                        onFocus={focusWindow}
-                        onDragStop={handleDragStop}
-                    >
-                        <AppComponent />
-                    </Window>
+                    <div key={win.id} style={{ display: win.isVisible ? "block" : "none" }}>
+                        <Window
+                            id={win.id}
+                            title={win.title}
+                            initialPosition={win.position}
+                            zIndex={win.zIndex}
+                            width={win.width}
+                            height={win.height}
+                            onClose={closeWindow}
+                            onFocus={focusWindow}
+                            onDragStop={handleDragStop}
+                        >
+                            <AppComponent />
+                        </Window>
+                    </div>
                 );
             })}
             <Dock onIconClick={openWindow} />
