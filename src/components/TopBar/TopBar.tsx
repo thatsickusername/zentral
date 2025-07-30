@@ -53,9 +53,12 @@ function TopBar() {
               align="left"
               trigger={<span>Zentral</span>}
           >
-            <div className="px-4 py-2 rounded-xl hover:bg-gray-500/20 hover:cursor-pointer transition-all cursor-pointer">Settings</div>
-            <div className="px-4 py-2 rounded-xl hover:bg-gray-500/20 hover:cursor-pointer transition-all cursor-pointer">About Zentral</div>
-            <div className="px-4 py-2 rounded-xl hover:bg-gray-500/20 hover:cursor-pointer transition-all cursor-pointer">About Developer</div>
+            <div className="px-4 py-2 rounded-xl hover:bg-gray-500/20 hover:cursor-pointer transition-all cursor-pointer">
+              <a href='https://github.com/thatsickusername/zentral' target='_blank'>About Zentral</a>
+            </div>
+            <div className="px-4 py-2 rounded-xl hover:bg-gray-500/20 hover:cursor-pointer transition-all cursor-pointer">
+              <a href='https://github.com/thatsickusername' target='_blank'>About Developer</a>
+            </div>
           </TopBarDropdown>
           
         </div>
@@ -66,9 +69,7 @@ function TopBar() {
                   align="right"
                   trigger={
                     <span>{user?.displayName}</span>
-                  }>
-                  <div className="px-4 py-2 rounded-xl hover:bg-gray-500/20 hover:cursor-pointer transition-all cursor-pointer">My Profile</div>
-                  
+                  }>                  
                   <div className="px-4 py-2 rounded-xl hover:bg-gray-500/20 hover:cursor-pointer transition-all cursor-pointer" onClick={logout}>Logout</div>
               </TopBarDropdown>
             

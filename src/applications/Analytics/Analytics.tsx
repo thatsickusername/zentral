@@ -17,11 +17,11 @@ function Analytics() {
                              onClick={()=>setActiveTab("today")}>Today
                     </button>
                     <button className={`px-4 py-2 rounded-md text-sm font-medium ${activeTab ==="something"? 'bg-blue-200 text-blue-700' : 'text-gray-600 hover:bg-gray-100' }`} 
-                             onClick={()=>setActiveTab("something")}>Something
+                             onClick={()=>setActiveTab("something")}>Trends
                     </button>
                 </div>
                 {
-                    activeTab === "overview" ? <OverviewTab/> : activeTab ==="today" ?  <TodayTab/> : <div>Something</div>
+                    activeTab === "overview" ? <OverviewTab/> : activeTab ==="today" ?  <TodayTab/> : <div>Trends</div>
                 }
         </div>
     );
