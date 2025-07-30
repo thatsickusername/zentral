@@ -4,11 +4,17 @@ import { Task } from "../types/Tasks";
 import { Session } from "../types/Session";
 import { SessionMetrics } from "../types/SessionMetrics";
 import { TaskMetrics } from "../types/TaskMetrics";
+import { DailyGoals } from "../types/DailyGoals";
 
 interface UserInfo {
   uid: string;
   displayName: string;
   email: string;
+}
+
+export const DEFAULT_DAILY_GOALS: DailyGoals = {
+  sessionCountGoal: 3,
+  sessionDurationGoal: 45 * 60
 }
 
 export const useFirestore = ()=>{
@@ -139,7 +145,6 @@ export const useFirestore = ()=>{
     }, {merge: true})
   }
 
-
     const fetchSessionMetrics = async(uid: string):Promise<SessionMetrics | null> =>{
         try{
           const sessionMetricRef = doc(db, "users", uid, "metrics", "sessionMetrics")
@@ -174,5 +179,53 @@ export const useFirestore = ()=>{
       }, {merge: true})
     }
 
-    return { checkIfInUser, fetchAllTasks, syncTasks, fetchAllSessions, syncSessions,fetchTaskMetrics, syncTaskMetrics, fetchSessionMetrics, syncSessionMetrics}
+     const fetchDailyGoals = async (uid: string): Promise<DailyGoals | null> => {
+      try {
+        const goalsRef = doc(db, "users", uid, "metrics", "dailyGoals");
+        const snap = await getDoc(goalsRef);
+    
+        if (snap.exists()) {
+          const data = snap.data();
+          return {
+            sessionCountGoal: data.sessionCountGoal ?? DEFAULT_DAILY_GOALS.sessionCountGoal,
+            sessionDurationGoal: data.sessionDurationGoal ?? DEFAULT_DAILY_GOALS.sessionDurationGoal
+          };
+        } else {
+          return DEFAULT_DAILY_GOALS;
+        }
+      } catch (error) {
+        console.error("Error fetching daily goals:", error);
+        return DEFAULT_DAILY_GOALS; // Fail-safe fallback
+      }
+    };
+    
+     const setDailyGoals = async (uid: string, goals: DailyGoals): Promise<void> => {
+      try {
+        const goalsRef = doc(db, "users", uid, "metrics", "dailyGoals");
+        await setDoc(
+          goalsRef,
+          {
+            ...goals,
+            updatedAt: serverTimestamp()
+          },
+          { merge: true }
+        );
+      } catch (error) {
+        console.error("Error setting daily goals:", error);
+        throw error;
+      }
+    };
+
+    return {  checkIfInUser, 
+              fetchAllTasks, 
+              syncTasks, 
+              fetchAllSessions, 
+              syncSessions,
+              fetchTaskMetrics, 
+              syncTaskMetrics, 
+              fetchSessionMetrics, 
+              syncSessionMetrics, 
+              fetchDailyGoals, 
+              setDailyGoals
+    }
 }

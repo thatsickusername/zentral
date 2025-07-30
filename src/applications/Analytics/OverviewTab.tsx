@@ -3,6 +3,7 @@ import { useSessions } from "../../hooks/useSessions";
 import { Session } from "../../types/Session";
 import HeatMap from "./HeatMap";
 import { useTasks } from "../../hooks/useTasks";
+import { displayDuration } from "../../utils/displayDuration";
 
 export interface DaySummary{
     count: number
@@ -76,21 +77,6 @@ function OverviewTab() {
     const [year, setYear] = useState<number>(currentYear);
     const summary = useMemo(() => groupSessionsByDate(sessions, year), [sessions, year]);
     const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - i);
-
-    function displayDuration(secondsInput: number): string {
-      const totalSeconds = Math.floor(secondsInput); // Remove decimals
-      const hours = Math.floor(totalSeconds / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-  
-      const parts: string[] = [];
-      if (hours > 0) parts.push(`${hours}h`);
-      if (minutes > 0) parts.push(`${minutes}m`);
-      if (hours < 0 && seconds > 0 || parts.length === 0) parts.push(`${seconds}s`);
-  
-      return parts.join(' ');
-  }
-
 
     return (
         <div className="w-full h-full">
