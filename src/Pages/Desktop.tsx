@@ -79,7 +79,6 @@ const Desktop = () => {
          setWindows(prevWindows => 
             prevWindows
                 .map(w =>  w.id === id ? { ...w, zIndex: zCounter } : w) // find the app in the current windows and update its zindex
-                .sort((a,b) => a.zIndex - b.zIndex) // Re-sort to help React with re-ordering DOM
         );
         // update zCounter +1 for next app to be focused
         setZCounter(prev => prev + 1);
