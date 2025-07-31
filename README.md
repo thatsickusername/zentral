@@ -13,8 +13,6 @@ Zentral empowers you to **manage tasks, track your time, analyze productivity tr
 
 ## 📸 Demo Preview
 
-> *Placeholder — Replace with your own screenshot or animated demo GIF.*
-
 ![Zentral Demo Screenshot](public/Screenshot.png)
 
 ---
